@@ -1,8 +1,18 @@
-<h1>アニメ聖地巡礼</h1>
-{% for spot in spots %}
-    <div>
-        <h2><a href="{% url 'spot_detail' spot.pk %}">{{ spot.title }}</a></h2>
-        <p>{{ spot.location }}</p>
-        <img src="{{ spot.image_url }}" width="300">
-    </div>
-{% endfor %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>アニメ聖地巡礼</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 50px; }
+    h1 { font-size: 3em; margin-bottom: 50px; }
+    .btn { display: inline-block; margin: 10px; padding: 15px 30px; font-size: 1.2em; text-decoration: none; background: #f39c12; color: white; border-radius: 8px; }
+    .btn:hover { background: #e67e22; }
+  </style>
+</head>
+<body>
+  <h1>簡単に聖地巡礼を始めよう！</h1>
+
+  <a href="{% url 'spot_list' %}" class="btn">ゲストで始める</a>
+</body>
+</html>
