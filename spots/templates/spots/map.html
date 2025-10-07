@@ -1,130 +1,144 @@
+{% load static %} 
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>アニメ聖地マップ</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <style>
-    body { margin: 0; font-family: Arial, sans-serif; }
+    <meta charset="UTF-8">
+    <title>アニメ聖地マップ</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <link rel="stylesheet" href="{% static 'spots/map.css' %}">
 
-    /* サイドバー */
-    .sidebar {
-      height: 100%;
-      width: 0;
-      position: fixed;
-      top: 0;
-      left: 0;
-      background-color: #333;
-      overflow-x: hidden;
-      transition: 0.3s;
-      padding-top: 60px;
-      z-index: 1000;
-    }
-    .sidebar a {
-      padding: 10px 20px;
-      text-decoration: none;
-      font-size: 18px;
-      color: white;
-      display: block;
-      transition: 0.2s;
-    }
-    .sidebar a:hover {
-      background-color: #575757;
-    }
+    <style>
+        /* 既存のメニュータブのスタイルはそのまま維持 */
+        body { margin: 0; font-family: Arial, sans-serif; }
 
-    /* メニューを開くボタン */
-    .openbtn {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      font-size: 20px;
-      background-color: #333;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      cursor: pointer;
-      border-radius: 4px;
-      z-index: 1100;
-    }
-    .openbtn:hover {
-      background-color: #444;
-    }
+        /* サイドバー */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #333;
+            overflow-x: hidden;
+            transition: 0.3s;
+            padding-top: 60px;
+            z-index: 1000;
+        }
+        .sidebar a {
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.2s;
+        }
+        .sidebar a:hover {
+            background-color: #575757;
+        }
 
-    /* メインコンテンツ */
-    .main-content {
-      margin-left: 20px;
-      padding-top: 50px;
-      transition: margin-left 0.3s;
-    }
+        /* メニューを開くボタン */
+        .openbtn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            z-index: 1100;
+        }
+        .openbtn:hover {
+            background-color: #444;
+        }
 
-    #map { height: 600px; }
+        /* メインコンテンツ */
+        .main-content {
+            /* 既存のスタイルを維持しつつIDを追加 */
+            margin-left: 0; /* 初期値は0に変更 */
+            padding-top: 50px;
+            transition: margin-left 0.3s;
+        }
 
-    .popup-img {
-      width: 150px;
-      height: auto;
-      display: block;
-      margin-bottom: 5px;
-    }
-  </style>
+        #map { height: 600px; }
+
+        .popup-img {
+            width: 150px;
+            height: auto;
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
-  <!-- メニューを開くボタン -->
-  <button class="openbtn" onclick="openNav()">☰ メニュー</button>
+    <button class="openbtn" onclick="openNav()">☰ メニュー</button>
 
-  <!-- サイドバー -->
-  <div id="mySidebar" class="sidebar">
-    <a href="javascript:void(0)" onclick="closeNav()">✖ 閉じる</a>
-    <a href="{% url 'home' %}">ホーム</a>
-    <a href="{% url 'spot_list' %}">聖地一覧</a>
-    <a href="{% url 'map' %}">マップ</a>
-    <a href="#">このサイトについて</a>
-  </div>
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" onclick="closeNav()">✖ 閉じる</a>
+        <a href="{% url 'home' %}">ホーム</a>
+        <a href="{% url 'spot_list' %}">聖地一覧</a>
+        <a href="{% url 'map' %}">マップ</a>
+        <a href="#">このサイトについて</a>
+    </div>
 
-  <!-- メインコンテンツ -->
-  <div class="main-content">
-    <h1>アニメ聖地マップ</h1>
-    <div id="map"></div>
-  </div>
+    <div id="main-content" class="main-content">
+        <h1>アニメ聖地マップ</h1>
+        <div id="map"></div>
+    </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    function openNav() {
-      document.getElementById("mySidebar").style.width = "250px";
-    }
-    function closeNav() {
-      document.getElementById("mySidebar").style.width = "0";
-    }
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const sidebarWidth = "250px";
+        
+        function openNav() {
+            document.getElementById("mySidebar").style.width = sidebarWidth;
+            // ★★★ メインコンテンツをずらす処理を追加（メニューの機能改善）★★★
+            document.getElementById("main-content").style.marginLeft = sidebarWidth;
+            // 地図を再描画して表示エリアの変更を適用
+            setTimeout(() => { map.invalidateSize(); }, 350); 
+        }
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+            // ★★★ メインコンテンツを元に戻す処理を追加（メニューの機能改善）★★★
+            document.getElementById("main-content").style.marginLeft = "0";
+            // 地図を再描画して表示エリアの変更を適用
+            setTimeout(() => { map.invalidateSize(); }, 350);
+        }
 
-    const map = L.map('map').setView([35.681236, 139.767125], 5);
+        // ... (以下、Leafletの地図初期化スクリプトはそのまま) ...
+        const map = L.map('map').setView([35.681236, 139.767125], 5);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
-    const spots = [
-      {% for spot in spots %}
-        {
-          image_url: "{{ spot.image_url|escapejs }}",
-          title: "{{ spot.title|escapejs }}",
-          location: "{{ spot.location|escapejs }}",
-          description: "{{ spot.description|escapejs }}",
-          latitude: {{ spot.latitude }},
-          longitude: {{ spot.longitude }}
-        }{% if not forloop.last %},{% endif %}
-      {% endfor %}
-    ];
+        const spots = [
+          {% for spot in spots %}
+            {
+              image_url: "{{ spot.image_url|escapejs }}",
+              title: "{{ spot.title|escapejs }}",
+              location: "{{ spot.location|escapejs }}",
+              description: "{{ spot.description|escapejs }}",
+              latitude: {{ spot.latitude }},
+              longitude: {{ spot.longitude }}
+            }{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ];
 
-    spots.forEach(function(spot) {
-      const popupContent = `
-        <img src="${spot.image_url}" alt="画像" class="popup-img">
-        <strong>${spot.title}</strong><br>
-        ${spot.location}<br>
-        ${spot.description}
-      `;
-      L.marker([spot.latitude, spot.longitude])
-       .addTo(map)
-       .bindPopup(popupContent);
-    });
-  </script>
+        spots.forEach(function(spot) {
+          const popupContent = `
+            <img src="${spot.image_url}" alt="画像" class="popup-img">
+            <strong>${spot.title}</strong><br>
+            ${spot.location}<br>
+            ${spot.description}
+          `;
+          L.marker([spot.latitude, spot.longitude])
+           .addTo(map)
+           .bindPopup(popupContent);
+        });
+    </script>
 </body>
 </html>

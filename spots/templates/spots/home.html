@@ -1,18 +1,16 @@
+{% load static %} 
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>アニメ聖地巡礼</title>
-  <style>
-    body { font-family: sans-serif; text-align: center; padding: 50px; }
-    h1 { font-size: 3em; margin-bottom: 50px; }
-    .btn { display: inline-block; margin: 10px; padding: 15px 30px; font-size: 1.2em; text-decoration: none; background: #f39c12; color: white; border-radius: 8px; }
-    .btn:hover { background: #e67e22; }
-  </style>
+    <meta charset="UTF-8">
+    <title>アニメ聖地巡礼</title>
+    <link rel="stylesheet" href="{% static 'spots/home.css' %}">
 </head>
 <body>
-  <h1>簡単に聖地巡礼を始めよう！</h1>
+    <div class="main-content">
+        <h1>簡単に聖地巡礼を始めよう！</h1>
 
-  <a href="{% url 'spot_list' %}" class="btn">ゲストで始める</a>
+        <a href="{% url 'spot_list' %}" class="btn">ゲストで始める</a>
+    </div>
 </body>
 </html>

@@ -1,9 +1,13 @@
+{% load static %} 
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>アニメ聖地巡礼 - 聖地一覧</title>
+    <link rel="stylesheet" href="{% static 'spots/spot_list.css' %}">
+    
     <style>
+        /* 既存のインラインCSS（メニュータブのスタイル）はそのまま維持します */
         body {
             margin: 0;
             font-family: sans-serif;
@@ -53,10 +57,11 @@
 
         /* メインコンテンツ */
         .main-content {
-            margin-left: 20px;
+            margin-left: 0; /* 初期値を0に変更 (CSSで調整するため) */
             padding-top: 50px;
             transition: margin-left 0.3s;
         }
+        /* .spot, .spot img の既存スタイルは外部CSSが上書きします */
         .spot {
             margin-bottom: 30px;
             border-bottom: 1px solid #ddd;
@@ -70,10 +75,8 @@
     </style>
 </head>
 <body>
-    <!-- メニューを開くボタン -->
     <button class="openbtn" onclick="openNav()">☰ メニュー</button>
 
-    <!-- サイドバー -->
     <div id="mySidebar" class="sidebar">
         <a href="javascript:void(0)" onclick="closeNav()">✖ 閉じる</a>
         <a href="{% url 'home' %}">ホーム</a>
@@ -82,18 +85,24 @@
         <a href="#">お問い合わせ</a>
     </div>
 
-    <!-- メインコンテンツ -->
-    <div class="main-content">
-        <h1>アニメ聖地巡礼</h1>
+    <div id="main-content" class="main-content">
+        <h1>アニメ聖地巡礼 聖地一覧</h1>
         {% for spot in spots %}
             <div class="spot">
-                <h2><a href="{% url 'spot_detail' spot.pk %}">{{ spot.title }}</a></h2>
-                <p>{{ spot.location }}</p>
+                
                 {% if spot.image_url %}
-                    <img src="{{ spot.image_url }}" alt="{{ spot.title }}">
-                {% else %}
-                    <p>画像はありません</p>
+                    <div class="spot-image-container">
+                        <img src="{{ spot.image_url }}" alt="{{ spot.title }}">
+                    </div>
                 {% endif %}
+                
+                <div class="spot-info-container">
+                    <h2><a href="{% url 'spot_detail' spot.pk %}">{{ spot.title }}</a></h2>
+                    <p>{{ spot.location }}</p>
+                    {% if not spot.image_url %}
+                        <p style="color:#ff4081;">画像はありません</p>
+                    {% endif %}
+                </div>
             </div>
         {% empty %}
             <p>登録された聖地はありません。</p>
@@ -101,12 +110,18 @@
     </div>
 
     <script>
+        const sidebarWidth = "250px";
+        
         function openNav() {
-            document.getElementById("mySidebar").style.width = "250px";
+            document.getElementById("mySidebar").style.width = sidebarWidth;
+            // ★★★ メインコンテンツをずらす処理を追加（メニューの機能改善）★★★
+            document.getElementById("main-content").style.marginLeft = sidebarWidth;
         }
 
         function closeNav() {
             document.getElementById("mySidebar").style.width = "0";
+            // ★★★ メインコンテンツを元に戻す処理を追加（メニューの機能改善）★★★
+            document.getElementById("main-content").style.marginLeft = "0";
         }
     </script>
 </body>

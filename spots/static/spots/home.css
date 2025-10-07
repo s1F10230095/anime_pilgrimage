@@ -1,0 +1,92 @@
+/* home.css (クール＆ダークな新デザイン) */
+
+/* -------------------- 全体設定 -------------------- */
+body {
+    /* フォント：モダンで読みやすいSans-serif系 */
+    font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    /* 背景：ダークブルーからブラックの深いグラデーション */
+    background: linear-gradient(135deg, #121212 0%, #1a237e 100%); 
+    color: #e0e0e0; /* 文字色を明るい灰色にして、黒背景に映えるように */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* 軽い星空やサイバー感のあるパターンがあればさらに良い */
+    /* background-image: url('noise.png'); /* 軽いノイズテクスチャなど */
+    overflow: hidden; 
+}
+
+/* -------------------- コンテンツエリア -------------------- */
+.main-content {
+    /* ほぼ黒に近い濃い背景色 */
+    background-color: rgba(18, 18, 18, 0.8); 
+    /* 背景を強くぼかすことで、SFやサイバーな雰囲気を出す */
+    backdrop-filter: blur(10px); 
+    padding: 70px 50px;
+    border-radius: 15px;
+    /* ネオンブルーの軽い光の輪郭 */
+    box-shadow: 
+        0 0 10px rgba(0, 188, 212, 0.5), /* 軽いネオンの輝き */
+        0 10px 30px rgba(0, 0, 0, 0.5); /* 強い影 */
+    animation: fadeInUp 1.2s ease-out; 
+    border: 1px solid rgba(3, 169, 244, 0.4); /* ネオンのフチ */
+}
+
+/* -------------------- ヘッダー（タイトル） -------------------- */
+h1 {
+    font-size: 4.5em; 
+    margin-bottom: 50px;
+    color: #ff4081; /* 鮮烈なマゼンタ（ピンク）でタイトルを強調 */
+    text-shadow: 
+        0 0 5px rgba(255, 64, 129, 0.8), 
+        0 0 15px rgba(255, 64, 129, 0.5); /* ネオン風の影 */
+    letter-spacing: 5px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* -------------------- ボタン -------------------- */
+.btn {
+    display: inline-block;
+    padding: 22px 55px;
+    font-size: 1.8em;
+    font-weight: bold;
+    text-decoration: none;
+    /* ボタンの色：クールなシアン（水色） */
+    background: linear-gradient(45deg, #00bcd4, #0097a7); 
+    color: #121212; /* ボタンの中の文字を濃い色にして視認性アップ */
+    border-radius: 5px; /* 角をシャープに */
+    box-shadow: 
+        0 0 5px rgba(0, 188, 212, 0.8), /* 軽いネオン */
+        0 8px 15px rgba(0, 0, 0, 0.5); /* 影 */
+    transition: all 0.3s ease-out; 
+    border: none;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn:hover {
+    background: linear-gradient(45deg, #0097a7, #00bcd4);
+    transform: scale(1.05); /* 拡大してホバーを強調 */
+    box-shadow: 
+        0 0 20px rgba(0, 229, 255, 1), /* 強いネオンの輝き */
+        0 15px 25px rgba(0, 0, 0, 0.7);
+}
+
+/* -------------------- アニメーション -------------------- */
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
