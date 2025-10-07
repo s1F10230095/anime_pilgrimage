@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>投稿一覧</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .post {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .post img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .post-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .post-meta {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>投稿一覧</h1>
+
+{% for post in posts %}
+  <div class="post">
+    <div class="post-header">{{ post.author.username }}</div>
+    <div class="post-meta">
+        投稿日時: {{ post.created_at|date:"Y-m-d H:i" }}
+        {% if post.spot %}
+            | 聖地: {{ post.spot.title }}
+        {% endif %}
+    </div>
+    
+    {% if post.text %}
+      <p>{{ post.text }}</p>
+    {% endif %}
+    
+    {% if post.image %}
+      <img src="{{ post.image.url }}" alt="投稿画像">
+    {% endif %}
+  </div>
+{% empty %}
+  <p>まだ投稿はありません。</p>
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>新規投稿</title>
+</head>
+<body>
+    <h1>新規投稿</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">投稿する</button>
+    </form>
+
+    <hr>
+    <a href="{% url 'post_list' %}">投稿一覧に戻る</a>
+</body>
+</html>

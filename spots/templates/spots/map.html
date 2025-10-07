@@ -72,13 +72,17 @@
   <button class="openbtn" onclick="openNav()">☰ メニュー</button>
 
   <!-- サイドバー -->
-  <div id="mySidebar" class="sidebar">
+<div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" onclick="closeNav()">✖ 閉じる</a>
     <a href="{% url 'home' %}">ホーム</a>
     <a href="{% url 'spot_list' %}">聖地一覧</a>
     <a href="{% url 'map' %}">マップ</a>
+    <a href="{% url 'post_list' %}">投稿一覧</a>
+    <a href="{% url 'post_create' %}">新規投稿</a>
     <a href="#">このサイトについて</a>
-  </div>
+</div>
+
+
 
   <!-- メインコンテンツ -->
   <div class="main-content">
@@ -128,3 +132,4 @@
   </script>
 </body>
 </html>
+  
