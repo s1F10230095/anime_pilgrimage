@@ -1,5 +1,7 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Spot
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Spot, Post
+from .forms import PostForm
+from django.contrib.auth.decorators import login_required
 
 def home(request):
     spots = Spot.objects.all()
@@ -17,3 +19,19 @@ def spot_detail(request, pk):
 def map_view(request):
     spots = Spot.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True)
     return render(request, 'spots/map.html', {'spots': spots})
+
+def post_list(request):
+    posts = Post.objects.all().order_by('-created_at')
+    return render(request, 'spots/post_list.html', {'posts': posts})
+
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user  # ログインユーザーを設定
+            post.save()
+            return redirect('post_list')
+    else:
+        form = PostForm()
+    return render(request, 'spots/post_form.html', {'form': form})
