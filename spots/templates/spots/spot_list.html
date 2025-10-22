@@ -7,12 +7,10 @@
     <link rel="stylesheet" href="{% static 'spots/spot_list.css' %}">
     
     <style>
-        /* 既存のインラインCSS（メニュータブのスタイル）はそのまま維持します */
         body {
             margin: 0;
             font-family: sans-serif;
         }
-        /* サイドバー */
         .sidebar {
             height: 100%;
             width: 0;
@@ -36,8 +34,6 @@
         .sidebar a:hover {
             background-color: #575757;
         }
-
-        /* メニューを開くボタン */
         .openbtn {
             position: fixed;
             top: 10px;
@@ -54,14 +50,11 @@
         .openbtn:hover {
             background-color: #444;
         }
-
-        /* メインコンテンツ */
         .main-content {
-            margin-left: 0; /* 初期値を0に変更 (CSSで調整するため) */
+            margin-left: 0;
             padding-top: 50px;
             transition: margin-left 0.3s;
         }
-        /* .spot, .spot img の既存スタイルは外部CSSが上書きします */
         .spot {
             margin-bottom: 30px;
             border-bottom: 1px solid #ddd;
@@ -71,6 +64,19 @@
             max-width: 100%;
             height: auto;
             border-radius: 5px;
+        }
+
+        /* ↓ 追加: 検索フォームのデザイン */
+        .filter-form {
+            margin: 20px 0;
+            padding: 10px;
+            background: #f8f8f8;
+            border-radius: 8px;
+        }
+        .filter-form select {
+            padding: 6px;
+            font-size: 14px;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -87,18 +93,32 @@
 
     <div id="main-content" class="main-content">
         <h1>アニメ聖地巡礼 聖地一覧</h1>
+
+        <!-- ✅ ジャンル検索フォーム -->
+    <form method="get" action="{% url 'spot_list' %}" class="filter-form">
+        <label for="genre">ジャンルで絞り込み：</label>
+        <select name="genre" id="genre" onchange="this.form.submit()">
+            <option value="">すべて</option>
+            {% for g in genres %}
+                <option value="{{ g }}" {% if g == selected_genre %}selected{% endif %}>{{ g }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+
+
+        <!-- ✅ 聖地リスト -->
         {% for spot in spots %}
             <div class="spot">
-                
                 {% if spot.image_url %}
                     <div class="spot-image-container">
                         <img src="{{ spot.image_url }}" alt="{{ spot.title }}">
                     </div>
                 {% endif %}
-                
                 <div class="spot-info-container">
                     <h2><a href="{% url 'spot_detail' spot.pk %}">{{ spot.title }}</a></h2>
                     <p>{{ spot.location }}</p>
+                    <p style="color: #666;">ジャンル：{{ spot.spot_type }}</p>  <!-- 追加 -->
                     {% if not spot.image_url %}
                         <p style="color:#ff4081;">画像はありません</p>
                     {% endif %}
@@ -111,16 +131,12 @@
 
     <script>
         const sidebarWidth = "250px";
-        
         function openNav() {
             document.getElementById("mySidebar").style.width = sidebarWidth;
-            // ★★★ メインコンテンツをずらす処理を追加（メニューの機能改善）★★★
             document.getElementById("main-content").style.marginLeft = sidebarWidth;
         }
-
         function closeNav() {
             document.getElementById("mySidebar").style.width = "0";
-            // ★★★ メインコンテンツを元に戻す処理を追加（メニューの機能改善）★★★
             document.getElementById("main-content").style.marginLeft = "0";
         }
     </script>
