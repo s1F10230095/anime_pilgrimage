@@ -1,0 +1,17 @@
+<!-- spots/templates/spots/spot_detail.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ spot.title }} - 詳細</title>
+</head>
+<body>
+    <h1>{{ spot.title }}</h1>
+    <p><strong>場所：</strong>{{ spot.location }}</p>
+    <p><strong>説明：</strong>{{ spot.description }}</p>
+    {% if spot.image_url %}
+        <img src="{{ spot.image_url }}" alt="{{ spot.title }}" style="max-width:300px;">
+    {% endif %}
+    <br><a href="{% url 'spot_list' %}">← 聖地一覧に戻る</a>
+</body>
+</html>
