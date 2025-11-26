@@ -121,3 +121,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ログイン後のリダイレクト先
+LOGIN_REDIRECT_URL = '/spots/map/'
+
+# ログアウト後のリダイレクト先 (トップページなどを想定)
+LOGOUT_REDIRECT_URL = '/' 
