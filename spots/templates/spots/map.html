@@ -5,11 +5,9 @@
     <meta charset="UTF-8">
     <title>アニメ聖地マップ</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
     <link rel="stylesheet" href="{% static 'spots/map.css' %}">
 
     <style>
-        /* 既存のメニュータブのスタイルはそのまま維持 */
         body { margin: 0; font-family: Arial, sans-serif; }
 
         /* サイドバー */
@@ -51,14 +49,11 @@
             border-radius: 4px;
             z-index: 1100;
         }
-        .openbtn:hover {
-            background-color: #444;
-        }
+        .openbtn:hover { background-color: #444; }
 
-        /* メインコンテンツ */
+        /* メイン */
         .main-content {
-            /* 既存のスタイルを維持しつつIDを追加 */
-            margin-left: 0; /* 初期値は0に変更 */
+            margin-left: 0;
             padding-top: 50px;
             transition: margin-left 0.3s;
         }
@@ -76,28 +71,16 @@
 <body>
     <button class="openbtn" onclick="openNav()">☰ メニュー</button>
 
-<<<<<<< HEAD
+    <!-- サイドバー -->
     <div id="mySidebar" class="sidebar">
         <a href="javascript:void(0)" onclick="closeNav()">✖ 閉じる</a>
         <a href="{% url 'home' %}">ホーム</a>
         <a href="{% url 'spot_list' %}">聖地一覧</a>
         <a href="{% url 'map' %}">マップ</a>
-        <a href="#">問い合わせ</a>
+        <a href="{% url 'post_list' %}">投稿一覧</a>
+        <a href="{% url 'post_create' %}">新規投稿</a>
+        <a href="#">このサイトについて</a>
     </div>
-=======
-  <!-- サイドバー -->
-<div id="mySidebar" class="sidebar">
-    <a href="javascript:void(0)" onclick="closeNav()">✖ 閉じる</a>
-    <a href="{% url 'home' %}">ホーム</a>
-    <a href="{% url 'spot_list' %}">聖地一覧</a>
-    <a href="{% url 'map' %}">マップ</a>
-    <a href="{% url 'post_list' %}">投稿一覧</a>
-    <a href="{% url 'post_create' %}">新規投稿</a>
-    <a href="#">このサイトについて</a>
-</div>
-
-
->>>>>>> 4c3757566ec1cac35ec5e50cd586982cc54b25ee
 
     <div id="main-content" class="main-content">
         <h1>アニメ聖地マップ</h1>
@@ -107,29 +90,25 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const sidebarWidth = "250px";
-        
         function openNav() {
             document.getElementById("mySidebar").style.width = sidebarWidth;
-            // ★★★ メインコンテンツをずらす処理を追加（メニューの機能改善）★★★
             document.getElementById("main-content").style.marginLeft = sidebarWidth;
-            // 地図を再描画して表示エリアの変更を適用
             setTimeout(() => { map.invalidateSize(); }, 350); 
         }
         function closeNav() {
             document.getElementById("mySidebar").style.width = "0";
-            // ★★★ メインコンテンツを元に戻す処理を追加（メニューの機能改善）★★★
             document.getElementById("main-content").style.marginLeft = "0";
-            // 地図を再描画して表示エリアの変更を適用
             setTimeout(() => { map.invalidateSize(); }, 350);
         }
 
-        // ... (以下、Leafletの地図初期化スクリプトはそのまま) ...
+        // ======== 地図の初期化 ========
         const map = L.map('map').setView([35.681236, 139.767125], 5);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
+        // ======== スポットのマーカー表示 ========
         const spots = [
           {% for spot in spots %}
             {
@@ -154,11 +133,62 @@
            .addTo(map)
            .bindPopup(popupContent);
         });
+
+        // ======== 🔍 URLパラメータから spot の位置を読み取る ========
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetLat = urlParams.get("lat");
+        const targetLng = urlParams.get("lng");
+
+        if (targetLat && targetLng) {
+            const spotLat = parseFloat(targetLat);
+            const spotLng = parseFloat(targetLng);
+
+            // 指定された聖地へズーム
+            map.setView([spotLat, spotLng], 14);
+
+            // その聖地のピンを強調する（赤いアイコンなど使ってもOK）
+            const highlightMarker = L.marker([spotLat, spotLng]).addTo(map);
+            highlightMarker.bindPopup("📍選択された聖地").openPopup();
+        }
+
+
+        // ======== ✅ 現在地を表示する処理 ========
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    // 現在地アイコン
+                    const userIcon = L.icon({
+                        iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 30],
+                        popupAnchor: [0, -25]
+                    });
+
+                    // 現在地マーカー追加
+                    const userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
+                    userMarker.bindPopup("📍あなたの現在地").openPopup();
+
+                    // 中心を現在地に移動
+                    map.setView([lat, lng], 13);
+
+                    // 現在地の範囲を円で表示（任意）
+                    L.circle([lat, lng], {
+                        radius: 1000, // 1km
+                        color: '#1E90FF',
+                        fillColor: '#1E90FF',
+                        fillOpacity: 0.2
+                    }).addTo(map);
+                },
+                function(error) {
+                    console.warn("位置情報の取得に失敗しました:", error.message);
+                }
+            );
+        } else {
+            alert("お使いのブラウザは位置情報に対応していません。");
+        }
     </script>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
-  
->>>>>>> 4c3757566ec1cac35ec5e50cd586982cc54b25ee

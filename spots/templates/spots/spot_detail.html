@@ -13,5 +13,13 @@
         <img src="{{ spot.image_url }}" alt="{{ spot.title }}" style="max-width:300px;">
     {% endif %}
     <br><a href="{% url 'spot_list' %}">← 聖地一覧に戻る</a>
+    
+    {% if spot.latitude and spot.longitude %}
+    <p>
+        <a href="{% url 'map' %}?lat={{ spot.latitude }}&lng={{ spot.longitude }}">
+            🌏 マップでこの聖地を見る
+        </a>
+    </p>
+    {% endif %}
 </body>
 </html>
