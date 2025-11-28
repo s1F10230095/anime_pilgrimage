@@ -81,15 +81,8 @@
     </style>
 </head>
 <body>
-    <button class="openbtn" onclick="openNav()">☰ メニュー</button>
+    {% include 'spots/sidebar.html' %}
 
-    <div id="mySidebar" class="sidebar">
-        <a href="javascript:void(0)" onclick="closeNav()">✖ 閉じる</a>
-        <a href="{% url 'home' %}">ホーム</a>
-        <a href="{% url 'spot_list' %}">聖地一覧</a>
-        <a href="{% url 'map' %}">マップ</a>
-        <a href="#">お問い合わせ</a>
-    </div>
 
     <div id="main-content" class="main-content">
         <h1>アニメ聖地巡礼 聖地一覧</h1>
