@@ -1,4 +1,4 @@
-{% load static %} 
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -9,7 +9,6 @@
 
     <style>
         body { margin: 0; font-family: Arial, sans-serif; }
-
         /* サイドバー */
         .sidebar {
             height: 100%;
@@ -61,135 +60,264 @@
         #map { height: 600px; }
 
         .popup-img {
-            width: 150px;
+            width: 150px
             height: auto;
             display: block;
+
             margin-bottom: 5px;
+
         }
-    </style>                                                                                                                                            値aaaaa
+
+    </style>                                                                                                                                            
+
 </head>
+
 <body>
+
     <button class="openbtn" onclick="openNav()">☰ メニュー</button>
 
+
+
     <!-- サイドバー -->
+
     <div id="mySidebar" class="sidebar">
+
         <a href="javascript:void(0)" onclick="closeNav()">✖ 閉じる</a>
+
         <a href="{% url 'home' %}">ホーム</a>
+
         <a href="{% url 'spot_list' %}">聖地一覧</a>
+
         <a href="{% url 'map' %}">マップ</a>
+
         <a href="{% url 'post_list' %}">投稿一覧</a>
+
         <a href="{% url 'post_create' %}">新規投稿</a>
+
         <a href="#">このサイトについて</a>
+
     </div>
+
     {% include 'spots/sidebar.html' %}
 
+
+
     <div id="main-content" class="main-content">
+
         <h1>アニメ聖地マップ</h1>
+
         <div id="map"></div>
+
     </div>
 
+
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <script>
+
         const sidebarWidth = "250px";
+
         function openNav() {
+
             document.getElementById("mySidebar").style.width = sidebarWidth;
+
             document.getElementById("main-content").style.marginLeft = sidebarWidth;
-            setTimeout(() => { map.invalidateSize(); }, 350); 
-        }
-        function closeNav() {
-            document.getElementById("mySidebar").style.width = "0";
-            document.getElementById("main-content").style.marginLeft = "0";
+
             setTimeout(() => { map.invalidateSize(); }, 350);
+
         }
+
+        function closeNav() {
+
+            document.getElementById("mySidebar").style.width = "0";
+
+            document.getElementById("main-content").style.marginLeft = "0";
+
+            setTimeout(() => { map.invalidateSize(); }, 350);
+
+        }
+
+
 
         // ======== 地図の初期化 ========
+
         const map = L.map('map').setView([35.681236, 139.767125], 5);
 
+
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
             attribution: '&copy; OpenStreetMap contributors'
+
         }).addTo(map);
 
+
+
         // ======== スポットのマーカー表示 ========
+
         const spots = [
+
           {% for spot in spots %}
+
             {
+
               image_url: "{{ spot.image_url|escapejs }}",
+
               title: "{{ spot.title|escapejs }}",
+
               location: "{{ spot.location|escapejs }}",
+
               description: "{{ spot.description|escapejs }}",
+
               latitude: {{ spot.latitude }},
+
               longitude: {{ spot.longitude }}
+
             }{% if not forloop.last %},{% endif %}
+
           {% endfor %}
+
         ];
 
+
+
         spots.forEach(function(spot) {
+
           const popupContent = `
+
             <img src="${spot.image_url}" alt="画像" class="popup-img">
+
             <strong>${spot.title}</strong><br>
+
             ${spot.location}<br>
+
             ${spot.description}
+
           `;
+
           L.marker([spot.latitude, spot.longitude])
+
            .addTo(map)
+
            .bindPopup(popupContent);
+
         });
 
+
+
         // ======== 🔍 URLパラメータから spot の位置を読み取る ========
+
         const urlParams = new URLSearchParams(window.location.search);
+
         const targetLat = urlParams.get("lat");
+
         const targetLng = urlParams.get("lng");
 
+
+
         if (targetLat && targetLng) {
+
             const spotLat = parseFloat(targetLat);
+
             const spotLng = parseFloat(targetLng);
 
+
+
             // 指定された聖地へズーム
+
             map.setView([spotLat, spotLng], 14);
 
+
+
             // その聖地のピンを強調する（赤いアイコンなど使ってもOK）
+
             const highlightMarker = L.marker([spotLat, spotLng]).addTo(map);
+
             highlightMarker.bindPopup("📍選択された聖地").openPopup();
+
         }
+
+
+
 
 
         // ======== ✅ 現在地を表示する処理 ========
+
         if (navigator.geolocation) {
+
             navigator.geolocation.getCurrentPosition(
+
                 function(position) {
+
                     const lat = position.coords.latitude;
+
                     const lng = position.coords.longitude;
 
+
+
                     // 現在地アイコン
+
                     const userIcon = L.icon({
+
                         iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+
                         iconSize: [30, 30],
+
                         iconAnchor: [15, 30],
+
                         popupAnchor: [0, -25]
+
                     });
 
+
+
                     // 現在地マーカー追加
+
                     const userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
+
                     userMarker.bindPopup("📍あなたの現在地").openPopup();
 
+
+
                     // 中心を現在地に移動
+
                     map.setView([lat, lng], 13);
 
+
+
                     // 現在地の範囲を円で表示（任意）
+
                     L.circle([lat, lng], {
+
                         radius: 1000, // 1km
+
                         color: '#1E90FF',
+
                         fillColor: '#1E90FF',
+
                         fillOpacity: 0.2
+
                     }).addTo(map);
+
                 },
+
                 function(error) {
+
                     console.warn("位置情報の取得に失敗しました:", error.message);
+
                 }
+
             );
+
         } else {
+
             alert("お使いのブラウザは位置情報に対応していません。");
+
         }
+
     </script>
+
 </body>
+
 </html>
