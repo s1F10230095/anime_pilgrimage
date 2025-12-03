@@ -46,6 +46,7 @@ def post_list(request):
     posts = Post.objects.all().order_by('-created_at')
     return render(request, 'spots/post_list.html', {'posts': posts})
 
+@login_required
 def post_create(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
