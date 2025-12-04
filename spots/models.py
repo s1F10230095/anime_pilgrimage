@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 class Spot(models.Model):
     title = models.CharField(max_length=100)
@@ -33,3 +34,21 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.author.username} on {self.post.id}"
+    
+class Title(models.Model):
+    name = models.CharField(max_length=100, verbose_name="称号名")
+    related_spot = models.ForeignKey(Spot, on_delete=models.CASCADE, verbose_name="対象スポット", related_name='titles')
+    
+    def __str__(self):
+        return self.name
+    
+class UserTitle(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title = models.ForeignKey(Title, on_delete=models.CASCADE)
+    obtained_at = models.DateTimeField(auto_now_add=True, verbose_name="獲得日時")
+
+    class Meta:
+        unique_together = ('user', 'title') # 同じ称号を二重取りしないようにする
+
+    def __str__(self):
+        return f"{self.user.username} - {self.title.name}"
