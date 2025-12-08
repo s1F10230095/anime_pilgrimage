@@ -46,6 +46,7 @@ def post_list(request):
     posts = Post.objects.all().order_by('-created_at')
     return render(request, 'spots/post_list.html', {'posts': posts})
 
+
 @login_required
 def post_create(request):
     if request.method == 'POST':
@@ -62,3 +63,20 @@ def post_create(request):
 def spot_detail(request, pk):
     spot = get_object_or_404(Spot, pk=pk)
     return render(request, 'spots/spot_detail.html', {'spot': spot})
+
+@login_required
+def edit_profile(request):
+    profile = request.user.profile
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile_view')
+    else:
+        form = ProfileForm(instance=profile)
+    return render(request, 'spots/profile_form.html', {'form': form})
+
+@login_required
+def profile_view(request):
+    profile = request.user.profile
+    return render(request, 'spots/profile_view.html', {'profile': profile})
