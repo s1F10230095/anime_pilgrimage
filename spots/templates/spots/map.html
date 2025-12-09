@@ -67,6 +67,119 @@
             margin-bottom: 5px;
         }
     </style>
+
+    <style>
+    /* 右上ユーザーメニュー全体 */
+    .user-menu-container {
+        position: fixed;
+        top: 10px;
+        right: 20px;
+        z-index: 2000;
+    }
+
+    /* メニューを開くボタン */
+    .user-menu-btn {
+        background: #333;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        border: none;
+    }
+
+    /* メニュー本体 */
+    .user-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        background: #fff;
+        color: #333;
+        border-radius: 6px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        margin-top: 8px;
+        width: 180px;
+    }
+
+    .user-menu a, .user-menu button {
+        display: block;
+        padding: 10px;
+        text-align: left;
+        width: 100%;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #333;
+        text-decoration: none;
+    }
+
+    .user-menu a:hover,
+    .user-menu button:hover {
+        background: #f1f1f1;
+    }
+</style>
+
+<div class="user-menu-container">
+    <button class="user-menu-btn" onclick="toggleUserMenu()">
+        {% if user.is_authenticated %}
+            👤 {{ user.username }}
+        {% else %}
+            ログイン
+        {% endif %}
+    </button>
+    <div id="userMenu" class="user-menu">
+    {% if user.is_authenticated %}
+        
+        <!-- アイコン表示 -->
+        {% if profile and profile.icon %}
+            <div style="text-align:center; padding:10px;">
+                <img src="{{ profile.icon.url }}" alt="icon"
+                     style="width:60px; height:60px; border-radius:50%;">
+            </div>
+        {% endif %}
+
+        <!-- 自己紹介表示 -->
+        {% if profile and profile.bio %}
+            <div style="padding:10px; font-size: 13px; color: #555;">
+                {{ profile.bio }}
+            </div>
+        {% endif %}
+
+        <a href="{% url 'profile_edit' %}">プロフィール編集</a>
+
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" style="color: red;">ログアウト</button>
+        </form>
+
+    {% else %}
+        <a href="{% url 'login' %}">ログイン</a>
+        <a href="{% url 'signup' %}">新規登録</a>
+    {% endif %}
+</div>
+
+    <div id="userMenu" class="user-menu">
+        {% if user.is_authenticated %}
+            <a href="{% url 'profile_edit' %}">プロフィール編集</a>
+
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" style="color: red;">ログアウト</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}">ログイン</a>
+            <a href="{% url 'signup' %}">新規登録</a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function toggleUserMenu() {
+    const menu = document.getElementById("userMenu");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+}
+</script>
+
 </head>
 
 <body>
