@@ -1,8 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Spot, Post
+from .models import Spot, Post, Title, UserTitle
 from .forms import PostForm
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .utils import calculate_distance
+import json
 
 def home(request):
     spots = Spot.objects.all()
@@ -64,6 +68,7 @@ def spot_detail(request, pk):
     spot = get_object_or_404(Spot, pk=pk)
     return render(request, 'spots/spot_detail.html', {'spot': spot})
 
+<<<<<<< HEAD
 @login_required
 def edit_profile(request):
     profile = request.user.profile
@@ -80,3 +85,42 @@ def edit_profile(request):
 def profile_view(request):
     profile = request.user.profile
     return render(request, 'spots/profile_view.html', {'profile': profile})
+=======
+@csrf_exempt # 本番ではCSRFトークンをJSで送るべきですが、まずは簡易実装
+def check_location(request):
+    """ 現在地を受け取って、近くの聖地の称号を付与するAPI """
+    if request.method == 'POST' and request.user.is_authenticated:
+        try:
+            data = json.loads(request.body)
+            user_lat = float(data.get('latitude'))
+            user_lon = float(data.get('longitude'))
+
+            earned_titles = []
+
+            # 全ての聖地と距離を比較（聖地が増えすぎたら将来的に改善が必要）
+            spots = Spot.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True)
+
+            for spot in spots:
+                distance = calculate_distance(user_lat, user_lon, spot.latitude, spot.longitude)
+                
+                # 🎯 判定：250メートル以内なら
+                if distance <= 250:
+                    # そのスポットに関連する称号を探す
+                    titles = Title.objects.filter(related_spot=spot)
+                    
+                    for title in titles:
+                        # まだ持っていない場合のみ付与
+                        obj, created = UserTitle.objects.get_or_create(user=request.user, title=title)
+                        if created:
+                            earned_titles.append(title.name)
+
+            if earned_titles:
+                return JsonResponse({'status': 'success', 'new_titles': earned_titles})
+            else:
+                return JsonResponse({'status': 'no_change'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+>>>>>>> 086d4a2b25e4a5db5afcf5efdf8cb3520f69d8ec

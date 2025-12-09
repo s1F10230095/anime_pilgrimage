@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure---wz%t!yl2bk^w=-azz^ndajp9%#24w3r&&a^plr(bqhm8grr5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -129,3 +129,9 @@ LOGOUT_REDIRECT_URL = 'home'
 # アップロードされたファイルの保存先設定
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.ngrok-free.app',
+    'https://*.ngrok-free.dev',  # ← これが重要！(.devを追加)
+    'https://nonintermittently-wheatless-dimple.ngrok-free.dev',
+]
