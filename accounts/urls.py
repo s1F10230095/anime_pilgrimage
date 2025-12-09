@@ -9,4 +9,6 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     # サインアップ画面 (自作します)
     path('signup/', views.signup, name='signup'),
+    path('profile/', views.profile_detail, name='profile_detail'),
+    path('profile/edit/', views.profile_edit, name='profile_edit'),
 ]

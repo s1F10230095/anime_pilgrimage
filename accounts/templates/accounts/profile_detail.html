@@ -1,0 +1,14 @@
+<h2>プロフィール</h2>
+
+{% if profile.icon %}
+    <img src="{{ profile.icon.url }}" width="120">
+{% else %}
+    <p>アイコン未設定</p>
+{% endif %}
+
+<p><strong>ユーザー名:</strong> {{ profile.user.username }}</p>
+<p><strong>自己紹介:</strong> {{ profile.bio|linebreaks }}</p>
+
+<a href="{% url 'profile_edit' %}">プロフィールを編集</a>
+<a href="{% url 'map' %}" class="btn btn-secondary">地図に戻る</a>
+
