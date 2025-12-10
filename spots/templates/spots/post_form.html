@@ -1,21 +1,48 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>新規投稿</title>
+    <link rel="stylesheet" href="{% static 'spots/post_form.css' %}">
 </head>
 <body>
     {% include 'spots/sidebar.html' %}
 
-    <h1>新規投稿</h1>
+    <div class="main-content-wrapper">
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">投稿する</button>
-    </form>
+        <h1>新規投稿</h1>
 
-    <hr>
-    <a href="{% url 'post_list' %}">投稿一覧に戻る</a>
+        <div class="form-container">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">投稿する</button>
+            </form>
+        </div>
+
+        <hr>
+        <a href="{% url 'post_list' %}" class="back-link">投稿一覧に戻る</a>
+    </div>
+
+    <script>
+        const sidebarWidth = "250px"; // サイドバーの幅と移動量を定義
+
+        function openNav() {
+            // 1. サイドバーを開く
+            document.getElementById("mySidebar").style.width = sidebarWidth;
+            
+            // 2. メインコンテンツ（body全体）を右にずらす
+            document.body.style.marginLeft = sidebarWidth;
+        }
+
+        function closeNav() {
+            // 1. サイドバーを閉じる
+            document.getElementById("mySidebar").style.width = "0";
+            
+            // 2. メインコンテンツの位置をリセットする
+            document.body.style.marginLeft = "0";
+        }
+    </script>
 </body>
 </html>
