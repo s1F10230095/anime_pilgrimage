@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Spot, Post, Title, UserTitle
-from .forms import PostForm
+from .models import Spot, Post, Title, UserTitle, Profile # Profileモデルをインポートに追加 (もし必要なら)
+from .forms import PostForm, ProfileForm # ProfileFormをインポートに追加 (もし必要なら)
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -22,7 +22,8 @@ def spot_list(request):
     # --- 🔹 カンマ・全角スペースなどで分割して整理 ---
     for g in raw_genres:
         if g:
-            parts = [p.strip() for p in g.replace('、', ',').replace('　', ' ').split(',')]
+            # カンマ(半角/全角)、スペース(全角)で分割できるようにする
+            parts = [p.strip() for p in g.replace('、', ',').replace('　', ',').replace(' ', ',').split(',')]
             for p in parts:
                 if p:
                     genre_set.add(p)
@@ -68,9 +69,15 @@ def spot_detail(request, pk):
     spot = get_object_or_404(Spot, pk=pk)
     return render(request, 'spots/spot_detail.html', {'spot': spot})
 
-<<<<<<< HEAD
+
+# --- 統合された関数群 ---
+
 @login_required
 def edit_profile(request):
+    # ProfileFormが未定義の場合、ここでエラーになる可能性があります
+    # 必要に応じて、from .forms import ProfileForm を追加してください
+    
+    # ユーザーがProfileを持っている前提（models.pyのシグナルで作成済み）
     profile = request.user.profile
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=profile)
@@ -85,7 +92,8 @@ def edit_profile(request):
 def profile_view(request):
     profile = request.user.profile
     return render(request, 'spots/profile_view.html', {'profile': profile})
-=======
+
+
 @csrf_exempt # 本番ではCSRFトークンをJSで送るべきですが、まずは簡易実装
 def check_location(request):
     """ 現在地を受け取って、近くの聖地の称号を付与するAPI """
@@ -123,4 +131,3 @@ def check_location(request):
             return JsonResponse({'status': 'error', 'message': str(e)})
     
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
->>>>>>> 086d4a2b25e4a5db5afcf5efdf8cb3520f69d8ec
