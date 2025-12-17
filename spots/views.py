@@ -5,7 +5,9 @@ from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
 from .utils import calculate_distance
+from openai import OpenAI
 import json
 
 def home(request):
@@ -131,3 +133,29 @@ def check_location(request):
             return JsonResponse({'status': 'error', 'message': str(e)})
     
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+# ==== あなたが Colab で使った設定 ====
+OPENAI_API_KEY = "1H14XTSCsJnjwWCtHdFnbXdf1EG_lUbYsUcqfgJcTuud5ljDwR0uo2NJY3Urz8NW6eUtFp1zFQdqO6NLnncgdiQ"
+OPENAI_API_BASE = "https://api.openai.iniad.org/api/v1"
+
+client = OpenAI(api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE)
+
+
+def ai_travel(request):
+    ai_response = None
+
+    if request.method == "POST":
+        user_input = request.POST.get("user_input")
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system",
+                 "content": "あなたは聖地巡礼プロの旅行プランナーです。場所・移動手段・モデルコースを詳しく丁寧に提案してください。"},
+                {"role": "user", "content": user_input},
+            ]
+        )
+
+        ai_response = response.choices[0].message.content
+
+    return render(request, "spots/ai_travel.html", {"ai_response": ai_response})

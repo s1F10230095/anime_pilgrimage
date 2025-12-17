@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AI 聖地巡礼プラン相談</title>
+</head>
+<body>
+
+    {% include 'spots/sidebar.html' %}
+<h2>AI に聖地巡礼の旅行プランを相談する</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <textarea name="user_input" rows="5" cols="60" placeholder="例：ラブライブの沼津で1日観光したい"></textarea><br>
+    <button type="submit">送信</button>
+</form>
+
+{% if ai_response %}
+    <hr>
+    <h3>AI の提案:</h3>
+    <pre>{{ ai_response }}</pre>
+{% endif %}
+
+</body>
+</html>
