@@ -1,5 +1,4 @@
 <button class="openbtn" onclick="openNav()">☰ メニュー</button>
-
 <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" onclick="closeNav()">✖ 閉じる</a>
     <a href="{% url 'home' %}">ホーム</a>
@@ -9,32 +8,14 @@
     <a href="{% url 'post_create' %}">投稿する</a>
     <a href="{% url 'ai_travel' %}">AI旅行プラン</a>
     <a href="#">問い合わせ</a>
-
-    <hr style="border-color: #555;">
-
+    <hr style="border-color: #333; margin: 10px 0;">
     {% if user.is_authenticated %}
-        <div class="user-info" style="padding-left: 32px; color: #f1f1f1;">
-            <p style="margin: 10px 0;">👤 {{ user.username }}</p>
-
-            <!-- プロフィール編集 -->
-            <a href="{% url 'profile_edit' %}" 
-               style="color: #f1f1f1; font-size: 18px; display: block; margin-bottom: 10px; padding-left: 0;">
-               プロフィール編集
-            </a>
-
-            <!-- ログアウト -->
+        <div style="padding: 10px 32px; color: #f1f1f1;">
+            <p>👤 {{ user.username }}</p>
+            <a href="{% url 'profile_detail' %}" style="padding: 10px 0; font-size: 16px;">プロフィール</a>
             <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
-                <button type="submit" style="
-                    color: #ff4444;
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    font-size: 20px;
-                    text-align: left;
-                    padding: 0;">
-                    ログアウト
-                </button>
+                <button type="submit" style="color: #ff4444; background: none; border: none; padding: 0; font-size: 16px;">ログアウト</button>
             </form>
         </div>
     {% else %}

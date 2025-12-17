@@ -1,58 +1,26 @@
-{% load static %} 
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>アニメ聖地巡礼</title>
-    <link rel="stylesheet" href="{% static 'spots/home.css' %}">
-    <style>
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px; /* ボタン同士の間隔 */
-            margin-top: 20px;
-        }
-        /* ログアウトボタンを他のボタンと見た目を合わせる */
-        .logout-btn {
-            cursor: pointer;
-            border: none;
-            font-size: 1rem;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <div class="main-content">
+    <div class="main-content" style="text-align: center;">
         <h1>簡単に聖地巡礼を始めよう！</h1>
-
-        {% if user.is_authenticated %}
-            <p style="color: white; font-size: 1.2rem; margin-bottom: 10px;">
-                おかえりなさい、<b>{{ user.username }}</b> さん
-            </p>
-
-            <div class="button-container">
+        <div class="form-container">
+            {% if user.is_authenticated %}
+                <p style="margin-bottom: 20px;">おかえりなさい、<b>{{ user.username }}</b> さん</p>
                 <a href="{% url 'spot_list' %}" class="btn">スタート</a>
-
-                <form action="{% url 'logout' %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn logout-btn" style="background-color: #ff4444; color: white;">
-                        ログアウト
-                    </button>
-                </form>
-            </div>
-
-        {% else %}
-            <div class="button-container">
-                <a href="{% url 'spot_list' %}" class="btn">ゲストで始める</a>
-
-                <a href="{% url 'login' %}" class="btn" style="background-color: #ffffff; color: #333;">
-                    ログイン
-                </a>
-            </div>
-            
-            <p style="margin-top: 15px;">
-                <a href="{% url 'signup' %}" style="color: #00ADB5; text-decoration: none;">新規登録はこちら</a>
-            </p>
-        {% endif %}
+            {% else %}
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <a href="{% url 'spot_list' %}" class="btn">ゲストで始める</a>
+                    <a href="{% url 'login' %}" class="btn" style="background-color: #fff; color: #111;">ログイン</a>
+                </div>
+                <p style="margin-top: 20px;"><a href="{% url 'signup' %}">新規登録はこちら</a></p>
+            {% endif %}
         </div>
+    </div>
 </body>
 </html>

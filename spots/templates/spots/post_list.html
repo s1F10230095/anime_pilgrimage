@@ -3,58 +3,52 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>投稿一覧</title>
-    <link rel="stylesheet" href="{% static 'spots/post_list.css' %}">
+    <title>投稿一覧 - アニメ聖地巡礼</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
 
-{% include 'spots/sidebar.html' %}
+    {% include 'spots/sidebar.html' %}
 
-<div class="post-list-container">
-    <h1>投稿一覧</h1> 
+    <div id="main-content" class="main-content">
+        <h1>聖地巡礼投稿一覧</h1>
 
-    {% for post in posts %}
-      <div class="post">
-        <div class="post-header">{{ post.author.username }}</div>
-        <div class="post-meta">
-            投稿日時: {{ post.created_at|date:"Y-m-d H:i" }}
-            {% if post.spot %}
-                | 聖地: {{ post.spot.title }}
-            {% endif %}
+        {% for spot in object_list %}
+        <div class="spot">
+            <div class="spot-image-container">
+                {% if spot.image %}
+                    <img src="{{ spot.image.url }}" alt="{{ spot.name }}">
+                {% else %}
+                    <div style="height: 150px; background: #333; border-radius: 8px; display: flex; align-items: center; justify-content: center;">No Image</div>
+                {% endif %}
+            </div>
+
+            <div class="spot-info-container">
+                <h2><a href="{% url 'spots:detail' spot.pk %}">{{ spot.name }}</a></h2>
+                <p>📍 場所：{{ spot.location }}</p>
+                <p>{{ spot.description|truncatechars:100 }}</p>
+            </div>
         </div>
-        
-        {% if post.text %}
-          <p>{{ post.text }}</p>
-        {% endif %}
-        
-        {% if post.image %}
-          <img src="{{ post.image.url }}" alt="投稿画像">
-        {% endif %}
-      </div>
-    {% empty %}
-      <p>まだ投稿はありません。</p>
-    {% endfor %}
-</div>
+        {% empty %}
+        <div class="form-container" style="text-align: center;">
+            <p>聖地がまだ登録されていません。</p>
+            <a href="{% url 'post_create' %}" class="btn" style="margin-top: 15px;">最初の投稿をする</a>
+        </div>
+        {% endfor %}
+    </div>
 
-<script>
-    const sidebarWidth = "250px"; // サイドバーの幅と移動量を定義
+    <script>
+        const sidebarWidth = "250px";
 
-    function openNav() {
-        // 1. サイドバーを開く
-        document.getElementById("mySidebar").style.width = sidebarWidth;
-        
-        // 2. メインコンテンツ（body全体）を右にずらす
-        document.body.style.marginLeft = sidebarWidth;
-    }
+        function openNav() {
+            document.getElementById("mySidebar").style.width = sidebarWidth;
+            document.getElementById("main-content").style.marginLeft = sidebarWidth;
+        }
 
-    function closeNav() {
-        // 1. サイドバーを閉じる
-        document.getElementById("mySidebar").style.width = "0";
-        
-        // 2. メインコンテンツの位置をリセットする
-        document.body.style.marginLeft = "0";
-    }
-</script>
-
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+            document.getElementById("main-content").style.marginLeft = "0";
+        }
+    </script>
 </body>
 </html>
