@@ -1,25 +1,31 @@
-<!-- spots/templates/spots/spot_detail.html -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>{{ spot.title }} - 詳細</title>
+    <title>{{ spot.title }}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <h1>{{ spot.title }}</h1>
-    <p><strong>場所：</strong>{{ spot.location }}</p>
-    <p><strong>説明：</strong>{{ spot.description }}</p>
-    {% if spot.image_url %}
-        <img src="{{ spot.image_url }}" alt="{{ spot.title }}" style="max-width:300px;">
-    {% endif %}
-    <br><a href="{% url 'spot_list' %}">← 聖地一覧に戻る</a>
-    
-    {% if spot.latitude and spot.longitude %}
-    <p>
-        <a href="{% url 'map' %}?lat={{ spot.latitude }}&lng={{ spot.longitude }}">
-            🌏 マップでこの聖地を見る
-        </a>
-    </p>
-    {% endif %}
+    {% include 'spots/sidebar.html' %}
+    <div class="main-content">
+        <h1>{{ spot.title }}</h1>
+        <div class="card" style="display: block; text-align: center;">
+            {% if spot.image_url %}
+                <img src="{{ spot.image_url }}" class="detail-img" style="max-width: 100%; margin-bottom: 20px;">
+            {% endif %}
+            <p><strong>場所：</strong>{{ spot.location }}</p>
+            <p style="margin: 20px 0;">{{ spot.description }}</p>
+            
+            {% if spot.latitude %}
+            <a href="{% url 'map' %}?lat={{ spot.latitude }}&lng={{ spot.longitude }}" class="btn">🌏 マップで見る</a>
+            {% endif %}
+        </div>
+        <a href="{% url 'spot_list' %}">← 聖地一覧に戻る</a>
+    </div>
+    <script>
+        function openNav() { document.getElementById("mySidebar").style.width = "250px"; document.body.style.marginLeft = "250px"; }
+        function closeNav() { document.getElementById("mySidebar").style.width = "0"; document.body.style.marginLeft = "0"; }
+    </script>
 </body>
 </html>

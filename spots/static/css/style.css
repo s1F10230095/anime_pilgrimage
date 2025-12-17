@@ -1,0 +1,240 @@
+/* style.css - 聖地巡礼アプリ 統合完全版デザイン */
+
+/* -------------------- 1. 全体・リセット設定 -------------------- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: linear-gradient(180deg, #1f1f1f 0%, #0a0a0a 100%);
+    color: #e0e0e0;
+    font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+    min-height: 100vh;
+    line-height: 1.6;
+    transition: margin-left 0.3s; /* サイドバー連動用 */
+}
+
+/* -------------------- 2. 基本レイアウト -------------------- */
+.main-content, .main-content-wrapper {
+    padding: 80px 5% 50px 5%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 2.5em;
+    color: #ff4081; /* マゼンタ */
+    text-align: center;
+    margin-bottom: 40px;
+    text-shadow: 0 0 8px rgba(255, 64, 129, 0.4);
+    border-bottom: 2px solid rgba(255, 64, 129, 0.3);
+    padding-bottom: 15px;
+}
+
+h2 {
+    color: #00bcd4; /* シアン */
+    margin-bottom: 20px;
+}
+
+/* -------------------- 3. 共通パーツ (ボタン・リンク) -------------------- */
+a {
+    color: #00bcd4;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+a:hover {
+    color: #ff4081;
+}
+
+.btn, button, input[type="submit"] {
+    display: inline-block;
+    background-color: #333;
+    color: #fff;
+    padding: 10px 25px;
+    border: 1px solid #00bcd4;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    font-size: 1rem;
+    text-decoration: none;
+}
+
+.btn:hover, button:hover, input[type="submit"]:hover {
+    background-color: #00bcd4;
+    color: #1a1a1a;
+    box-shadow: 0 0 15px rgba(0, 188, 212, 0.6);
+}
+
+/* -------------------- 4. フォーム設定 (Django {{ form.as_p }} 対応) -------------------- */
+.form-container {
+    background-color: #1a1a1a;
+    padding: 30px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+}
+
+.django-form p {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.django-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #00bcd4; /* 項目名をシアンで強調 */
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+input[type="text"], input[type="password"], input[type="email"], 
+input[type="number"], input[type="file"], textarea, select {
+    width: 100%;
+    padding: 12px;
+    margin: 5px 0 10px 0;
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+}
+
+input:focus, textarea:focus, select:focus {
+    border-color: #00bcd4;
+    box-shadow: 0 0 5px rgba(0, 188, 212, 0.5);
+}
+
+.helptext {
+    display: block;
+    font-size: 0.8em;
+    color: #888;
+    margin-top: -5px;
+    margin-bottom: 10px;
+}
+
+/* -------------------- 5. サイドバー設定 -------------------- */
+.sidebar {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 2000;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+    border-right: 1px solid #333;
+}
+
+.sidebar a {
+    padding: 10px 32px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    color: #ff4081;
+    background-color: #1a1a1a;
+}
+
+.openbtn {
+    font-size: 20px;
+    cursor: pointer;
+    background-color: #111;
+    color: white;
+    padding: 10px 15px;
+    border: 1px solid #333;
+    border-radius: 0 5px 5px 0;
+    position: fixed;
+    top: 10px;
+    left: 0;
+    z-index: 1000;
+}
+
+/* -------------------- 6. 聖地カード & 詳細デザイン -------------------- */
+.spot, .card {
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+    display: flex; 
+    gap: 20px;
+    align-items: center;
+    transition: transform 0.3s;
+}
+
+.spot:hover {
+    transform: translateY(-5px);
+    border-color: #00bcd4;
+}
+
+.spot-image-container {
+    flex: 1;
+    max-width: 300px;
+}
+
+.spot img, .detail-img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 2px solid #333;
+    object-fit: cover;
+}
+
+.spot-info-container {
+    flex: 2;
+}
+
+/* -------------------- 7. マップ設定 (#map) -------------------- */
+#map {
+    height: 500px;
+    width: 100%;
+    border-radius: 10px;
+    border: 2px solid #333;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+/* マップポップアップ */
+.leaflet-popup-content-wrapper {
+    background-color: #1a1a1a !important;
+    color: #fff !important;
+    border: 1px solid #00bcd4;
+}
+
+.leaflet-popup-tip {
+    background-color: #1a1a1a !important;
+}
+
+/* -------------------- 8. レスポンシブ対応 -------------------- */
+@media (max-width: 600px) {
+    .main-content {
+        padding: 60px 20px;
+    }
+    .spot {
+        flex-direction: column;
+        text-align: center;
+    }
+    .spot-image-container {
+        max-width: 100%;
+    }
+    h1 {
+        font-size: 2em;
+    }
+    #map {
+        height: 350px;
+    }
+}

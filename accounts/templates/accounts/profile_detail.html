@@ -1,14 +1,29 @@
-<h2>プロフィール</h2>
-
-{% if profile.icon %}
-    <img src="{{ profile.icon.url }}" width="120">
-{% else %}
-    <p>アイコン未設定</p>
-{% endif %}
-
-<p><strong>ユーザー名:</strong> {{ profile.user.username }}</p>
-<p><strong>自己紹介:</strong> {{ profile.bio|linebreaks }}</p>
-
-<a href="{% url 'profile_edit' %}">プロフィールを編集</a>
-<a href="{% url 'map' %}" class="btn btn-secondary">地図に戻る</a>
-
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>プロフィール</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    {% include 'spots/sidebar.html' %}
+    <div class="main-content">
+        <h1>プロフィール</h1>
+        <div class="form-container" style="text-align: center;">
+            {% if profile.icon %}
+                <img src="{{ profile.icon.url }}" style="width: 120px; height: 120px; border-radius: 50%; border: 2px solid #00bcd4; margin-bottom: 20px;">
+            {% endif %}
+            <p><strong>ユーザー名:</strong> {{ profile.user.username }}</p>
+            <div style="margin: 20px 0; background: #2a2a2a; padding: 15px; border-radius: 5px;">
+                {{ profile.bio|linebreaks }}
+            </div>
+            <a href="{% url 'profile_edit' %}" class="btn">編集する</a>
+        </div>
+    </div>
+    <script>
+        function openNav() { document.getElementById("mySidebar").style.width = "250px"; document.body.style.marginLeft = "250px"; }
+        function closeNav() { document.getElementById("mySidebar").style.width = "0"; document.body.style.marginLeft = "0"; }
+    </script>
+</body>
+</html>

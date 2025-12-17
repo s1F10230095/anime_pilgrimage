@@ -1,9 +1,32 @@
-<h2>ログイン</h2>
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ログイン - アニメ聖地巡礼</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="main-content">
+        <h1>ログイン</h1>
 
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">ログインする</button>
-</form>
-
-<p>アカウントをお持ちでないですか？ <a href="{% url 'signup' %}">新規登録はこちら</a></p>
+        <div class="form-container">
+            <form method="post">
+                {% csrf_token %}
+                <div class="django-form">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" style="width: 100%; margin-top: 10px;">ログインする</button>
+            </form>
+            
+            <p style="margin-top: 25px; text-align: center; font-size: 0.9em;">
+                アカウントをお持ちでないですか？ <br>
+                <a href="{% url 'signup' %}" style="font-weight: bold;">新規アカウント登録はこちら</a>
+            </p>
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="{% url 'home' %}" style="color: #888;">ホームへ戻る</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

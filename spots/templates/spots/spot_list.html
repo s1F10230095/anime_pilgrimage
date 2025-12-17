@@ -1,137 +1,45 @@
-{% load static %} 
+{% load static %}
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>アニメ聖地巡礼 - 聖地一覧</title>
-    <link rel="stylesheet" href="{% static 'spots/spot_list.css' %}">
-    
-    <style>
-        body {
-            margin: 0;
-            font-family: sans-serif;
-        }
-        .sidebar {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #333;
-            overflow-x: hidden;
-            transition: 0.3s;
-            padding-top: 60px;
-            z-index: 1000;
-        }
-        .sidebar a {
-            padding: 10px 20px;
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            display: block;
-            transition: 0.2s;
-        }
-        .sidebar a:hover {
-            background-color: #575757;
-        }
-        .openbtn {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            font-size: 20px;
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 4px;
-            z-index: 1100;
-        }
-        .openbtn:hover {
-            background-color: #444;
-        }
-        .main-content {
-            margin-left: 0;
-            padding-top: 50px;
-            transition: margin-left 0.3s;
-        }
-        .spot {
-            margin-bottom: 30px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 15px;
-        }
-        .spot img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
-        }
-
-        /* ↓ 追加: 検索フォームのデザイン */
-        .filter-form {
-            margin: 20px 0;
-            padding: 10px;
-            background: #f8f8f8;
-            border-radius: 8px;
-        }
-        .filter-form select {
-            padding: 6px;
-            font-size: 14px;
-            border-radius: 4px;
-        }
-    </style>
+    <title>聖地一覧</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     {% include 'spots/sidebar.html' %}
-
-
     <div id="main-content" class="main-content">
-        <h1>アニメ聖地巡礼 聖地一覧</h1>
-
-        <!-- ✅ ジャンル検索フォーム -->
-    <form method="get" action="{% url 'spot_list' %}" class="filter-form">
-        <label for="genre">ジャンルで絞り込み：</label>
-        <select name="genre" id="genre" onchange="this.form.submit()">
-            <option value="">すべて</option>
-            {% for g in genres %}
+        <h1>聖地一覧</h1>
+        <form method="get" class="form-container" style="margin-bottom: 30px; padding: 15px;">
+            <label>ジャンル：</label>
+            <select name="genre" onchange="this.form.submit()" style="margin: 0; width: auto;">
+                <option value="">すべて</option>
+                {% for g in genres %}
                 <option value="{{ g }}" {% if g == selected_genre %}selected{% endif %}>{{ g }}</option>
-            {% endfor %}
-        </select>
-    </form>
+                {% endfor %}
+            </select>
+        </form>
 
-
-
-        <!-- ✅ 聖地リスト -->
         {% for spot in spots %}
-            <div class="spot">
+        <div class="spot">
+            <div class="spot-image-container" style="flex: 1;">
                 {% if spot.image_url %}
-                    <div class="spot-image-container">
-                        <img src="{{ spot.image_url }}" alt="{{ spot.title }}">
-                    </div>
+                    <img src="{{ spot.image_url }}" alt="{{ spot.title }}">
+                {% else %}
+                    <div style="height: 150px; background: #333; border-radius: 8px; display: flex; align-items: center; justify-content: center;">No Image</div>
                 {% endif %}
-                <div class="spot-info-container">
-                    <h2><a href="{% url 'spot_detail' spot.pk %}">{{ spot.title }}</a></h2>
-                    <p>{{ spot.location }}</p>
-                    <p style="color: #666;">ジャンル：{{ spot.spot_type }}</p>  <!-- 追加 -->
-                    {% if not spot.image_url %}
-                        <p style="color:#ff4081;">画像はありません</p>
-                    {% endif %}
-                </div>
             </div>
-        {% empty %}
-            <p>登録された聖地はありません。</p>
+            <div class="spot-info-container" style="flex: 2;">
+                <h2><a href="{% url 'spot_detail' spot.pk %}">{{ spot.title }}</a></h2>
+                <p>📍 {{ spot.location }}</p>
+                <p style="color: #00bcd4;">#{{ spot.spot_type }}</p>
+            </div>
+        </div>
         {% endfor %}
     </div>
-
     <script>
-        const sidebarWidth = "250px";
-        function openNav() {
-            document.getElementById("mySidebar").style.width = sidebarWidth;
-            document.getElementById("main-content").style.marginLeft = sidebarWidth;
-        }
-        function closeNav() {
-            document.getElementById("mySidebar").style.width = "0";
-            document.getElementById("main-content").style.marginLeft = "0";
-        }
+        function openNav() { document.getElementById("mySidebar").style.width = "250px"; document.body.style.marginLeft = "250px"; }
+        function closeNav() { document.getElementById("mySidebar").style.width = "0"; document.body.style.marginLeft = "0"; }
     </script>
 </body>
 </html>

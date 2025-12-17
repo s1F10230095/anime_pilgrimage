@@ -1,11 +1,40 @@
-profile, created = Profile.objects.get_or_create(user=request.user)
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>プロフィール編集 - アニメ聖地巡礼</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    {% include 'spots/sidebar.html' %}
 
-<h2>プロフィール編集</h2>
+    <div id="main-content" class="main-content">
+        <h1>プロフィール編集</h1>
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">保存</button>
-</form>
+        <div class="form-container">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="django-form">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" style="width: 100%; margin-top: 20px;">変更を保存する</button>
+            </form>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="{% url 'profile_detail' %}">キャンセルして戻る</a>
+            </div>
+        </div>
+    </div>
 
-<a href="{% url 'profile_detail' %}">戻る</a>
+    <script>
+        function openNav() {
+            document.getElementById("mySidebar").style.width = "250px";
+            document.getElementById("main-content").style.marginLeft = "250px";
+        }
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+            document.getElementById("main-content").style.marginLeft = "0";
+        }
+    </script>
+</body>
+</html>
