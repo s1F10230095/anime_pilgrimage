@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
+import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +22,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure---wz%t!yl2bk^w=-azz^ndajp9%#24w3r&&a^plr(bqhm8grr5'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-local-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = 'RENDER' not in os.environ
 
-ALLOWED_HOSTS = ['*']
+# ▼▼▼ ここが重要！ ▼▼▼
+if not DEBUG:
+    # 🔴 本番環境 (Render) の場合
+    ALLOWED_HOSTS = []
+    RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+    if RENDER_EXTERNAL_HOSTNAME:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+else:
+    # 🟢 開発環境 (自分のPC / ngrok) の場合
+    ALLOWED_HOSTS = ['*']  # ngrokもlocalhostも全て許可する
 
 
 # Application definition
@@ -43,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -82,6 +94,10 @@ DATABASES = {
     }
 }
 
+# Render上にいるときは、PostgreSQLを使う設定に上書きする
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(db_from_env)
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -119,6 +135,15 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# ▼▼▼ 以下を追加・修正 ▼▼▼
+if not DEBUG:
+    # 本番環境(Render)用の設定
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+else:
+    # 開発環境用の設定
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -135,4 +160,5 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok-free.app',
     'https://*.ngrok-free.dev',  # ← これが重要！(.devを追加)
     'https://nonintermittently-wheatless-dimple.ngrok-free.dev',
+    'https://*.onrender.com',
 ]
