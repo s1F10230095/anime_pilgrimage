@@ -14,6 +14,46 @@
             {% if spot.image_url %}
                 <img src="{{ spot.image_url }}" class="detail-img" style="max-width: 100%; margin-bottom: 20px;">
             {% endif %}
+
+            {% if user.is_authenticated %}
+                <div style="margin-bottom: 20px;">
+                    <button id="fav-btn" onclick="toggleFavorite({{ spot.pk }})" style="
+                        background: none; 
+                        border: 2px solid #ff4081; 
+                        color: #ff4081; 
+                        padding: 10px 25px; 
+                        border-radius: 30px; 
+                        cursor: pointer; 
+                        font-weight: bold; 
+                        font-size: 1rem;
+                        transition: 0.3s;">
+                        {% if request.user in spot.favorites.all %}
+                            ❤️ お気に入り解除
+                        {% else %}
+                            🤍 お気に入り登録
+                        {% endif %}
+                    </button>
+                </div>
+
+                {% if has_visited %}
+                    <div style="margin-bottom: 30px; padding: 15px; background: rgba(0, 188, 212, 0.1); border-radius: 10px; display: inline-block;">
+                        <p style="color: #00bcd4; font-weight: bold; margin-bottom: 10px;">🎉 あなたはこの聖地の巡礼者です！</p>
+                        <a href="{% url 'post_create' %}?spot_id={{ spot.pk }}" class="btn" style="
+                            display: inline-block;
+                            background-color: #e91e63; /* 目立つピンク色 */
+                            color: white;
+                            text-decoration: none;
+                            padding: 12px 25px;
+                            border-radius: 30px;
+                            font-weight: bold;
+                            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+                            transition: 0.3s;">
+                            📝 この聖地の思い出を投稿する
+                        </a>
+                    </div>
+                {% endif %}
+                {% endif %}
+
             <p><strong>場所：</strong>{{ spot.location }}</p>
             <p style="margin: 20px 0;">{{ spot.description }}</p>
             
@@ -23,9 +63,26 @@
         </div>
         <a href="{% url 'spot_list' %}">← 聖地一覧に戻る</a>
     </div>
+
     <script>
         function openNav() { document.getElementById("mySidebar").style.width = "250px"; document.body.style.marginLeft = "250px"; }
         function closeNav() { document.getElementById("mySidebar").style.width = "0"; document.body.style.marginLeft = "0"; }
+
+        function toggleFavorite(spotId) {
+            fetch(`/favorite/${spotId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const btn = document.getElementById('fav-btn');
+                if (data.liked) {
+                    btn.innerHTML = "❤️ お気に入り解除";
+                    btn.style.backgroundColor = "rgba(255, 64, 129, 0.1)";
+                } else {
+                    btn.innerHTML = "🤍 お気に入り登録";
+                    btn.style.backgroundColor = "transparent";
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
     </script>
 </body>
 </html>

@@ -13,6 +13,12 @@ class Spot(models.Model):
     image_url = models.URLField(blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    favorites = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, 
+        related_name='favorite_spots', 
+        blank=True, 
+        verbose_name="お気に入り登録したユーザー"
+    )
 
     def __str__(self):
         return self.title

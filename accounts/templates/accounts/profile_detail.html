@@ -8,19 +8,106 @@
 </head>
 <body>
     {% include 'spots/sidebar.html' %}
+    
     <div class="main-content">
         <h1>プロフィール</h1>
-        <div class="form-container" style="text-align: center;">
+        <div class="form-container" style="text-align: center; max-width: 600px; margin: 0 auto;">
+            
             {% if profile.icon %}
-                <img src="{{ profile.icon.url }}" style="width: 120px; height: 120px; border-radius: 50%; border: 2px solid #00bcd4; margin-bottom: 20px;">
+                <img src="{{ profile.icon.url }}" style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid #00bcd4; margin-bottom: 20px; object-fit: cover;">
+            {% else %}
+                <div style="width: 120px; height: 120px; border-radius: 50%; border: 3px solid #555; background: #333; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: #aaa;">No Image</div>
             {% endif %}
-            <p><strong>ユーザー名:</strong> {{ profile.user.username }}</p>
-            <div style="margin: 20px 0; background: #2a2a2a; padding: 15px; border-radius: 5px;">
-                {{ profile.bio|linebreaks }}
+
+            <p style="font-size: 1.5rem; margin-bottom: 10px;"><strong>{{ profile.user.username }}</strong></p>
+            
+            <div style="margin: 20px 0; background: #2a2a2a; padding: 20px; border-radius: 8px; text-align: left;">
+                <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 5px;">自己紹介</p>
+                <div style="line-height: 1.6;">
+                    {% if profile.bio %}
+                        {{ profile.bio|linebreaks }}
+                    {% else %}
+                        <p style="color: #777;">自己紹介はまだありません。</p>
+                    {% endif %}
+                </div>
             </div>
-            <a href="{% url 'profile_edit' %}" class="btn">編集する</a>
+
+            <div style="margin: 30px 0; text-align: left;">
+                <h3 style="border-bottom: 2px solid #00bcd4; padding-bottom: 5px; color: #fff; display: inline-block;">🏆 獲得した称号</h3>
+                
+                {% if user_titles %}
+                    <ul style="list-style: none; padding: 0; margin-top: 15px;">
+                        {% for item in user_titles %}
+                            <li style="
+                                background: #222; 
+                                color: #fff; 
+                                padding: 15px; 
+                                margin-bottom: 10px; 
+                                border-left: 5px solid #00bcd4;
+                                border-radius: 4px;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                                
+                                <span style="font-weight: bold; font-size: 1.1em;">
+                                    {{ item.title.name }}
+                                </span>
+                                
+                                <span style="font-size: 0.8em; color: #aaa;">
+                                    {{ item.obtained_at|date:"Y/m/d" }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div style="background: #2a2a2a; padding: 20px; border-radius: 8px; margin-top: 15px; text-align: center; color: #aaa;">
+                        まだ称号を獲得していません。<br>
+                        聖地を訪れて称号をゲットしよう！
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="margin: 30px 0; text-align: left;">
+                <h3 style="border-bottom: 2px solid #ff4081; padding-bottom: 5px; color: #fff; display: inline-block;">❤️ お気に入りの聖地</h3>
+                
+                {% if favorite_spots %}
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px;">
+                        {% for spot in favorite_spots %}
+                            <div style="width: 150px; background: #222; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                                {% if spot.image_url %}
+                                    <img src="{{ spot.image_url }}" style="width: 100%; height: 100px; object-fit: cover;">
+                                {% else %}
+                                    <div style="width: 100%; height: 100px; background: #444; display: flex; align-items: center; justify-content: center; color: #888; font-size: 0.8rem;">No Image</div>
+                                {% endif %}
+                                
+                                <div style="padding: 10px;">
+                                    <a href="{% url 'spot_detail' spot.pk %}" style="color: white; text-decoration: none; font-weight: bold; font-size: 0.9rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        {{ spot.title }}
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: #aaa; margin-top: 10px; background: #2a2a2a; padding: 15px; border-radius: 8px;">まだお気に入りの聖地はありません。</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'profile_edit' %}" class="btn" style="
+                display: inline-block; 
+                background-color: #00bcd4; 
+                color: white; 
+                padding: 10px 30px; 
+                text-decoration: none; 
+                border-radius: 5px; 
+                margin-top: 20px;
+                font-weight: bold;">
+                プロフィールを編集する
+            </a>
+            
         </div>
     </div>
+
     <script>
         function openNav() { document.getElementById("mySidebar").style.width = "250px"; document.body.style.marginLeft = "250px"; }
         function closeNav() { document.getElementById("mySidebar").style.width = "0"; document.body.style.marginLeft = "0"; }

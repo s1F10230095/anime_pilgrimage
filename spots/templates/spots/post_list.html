@@ -5,46 +5,114 @@
     <meta charset="UTF-8">
     <title>投稿一覧 - アニメ聖地巡礼</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* 投稿カードのデザイン */
+        .post-card {
+            background-color: #222;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            border-left: 5px solid #e91e63; /* ピンクのアクセント */
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+        .post-author {
+            font-weight: bold;
+            color: #00bcd4;
+            font-size: 1.1rem;
+        }
+        .post-date {
+            color: #aaa;
+            font-size: 0.8rem;
+        }
+        .post-spot-link {
+            display: inline-block;
+            background-color: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+        .post-spot-link:hover {
+            background-color: #444;
+        }
+        .post-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .post-text {
+            margin-top: 15px;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #eee;
+        }
+    </style>
 </head>
 <body>
 
     {% include 'spots/sidebar.html' %}
 
     <div id="main-content" class="main-content">
-        <h1>聖地巡礼投稿一覧</h1>
+        <h1>みんなの巡礼記録</h1>
 
-        {% for spot in object_list %}
-        <div class="spot">
-            <div class="spot-image-container">
-                {% if spot.image %}
-                    <img src="{{ spot.image.url }}" alt="{{ spot.name }}">
-                {% else %}
-                    <div style="height: 150px; background: #333; border-radius: 8px; display: flex; align-items: center; justify-content: center;">No Image</div>
-                {% endif %}
+        <div style="text-align: right; margin-bottom: 20px;">
+            <a href="{% url 'post_create' %}" class="btn">＋ 新規投稿する</a>
+        </div>
+
+        {% for post in posts %}
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-author">
+                    👤 {{ post.author.username }}
+                </div>
+                <div class="post-date">
+                    {{ post.created_at|date:"Y/m/d H:i" }}
+                </div>
             </div>
 
-            <div class="spot-info-container">
-                <h2><a href="{% url 'spots:detail' spot.pk %}">{{ spot.name }}</a></h2>
-                <p>📍 場所：{{ spot.location }}</p>
-                <p>{{ spot.description|truncatechars:100 }}</p>
+            {% if post.spot %}
+            <div>
+                <a href="{% url 'spot_detail' post.spot.pk %}" class="post-spot-link">
+                    📍 {{ post.spot.title }}
+                </a>
             </div>
+            {% endif %}
+
+            <div class="post-text">
+                {{ post.text|linebreaksbr }}
+            </div>
+
+            {% if post.image %}
+                <img src="{{ post.image.url }}" alt="投稿画像" class="post-image">
+            {% endif %}
+
         </div>
         {% empty %}
         <div class="form-container" style="text-align: center;">
-            <p>聖地がまだ登録されていません。</p>
-            <a href="{% url 'post_create' %}" class="btn" style="margin-top: 15px;">最初の投稿をする</a>
+            <p>まだ投稿がありません。</p>
+            <p>一番乗りで投稿してみましょう！</p>
+            <a href="{% url 'post_create' %}" class="btn" style="margin-top: 15px;">投稿する</a>
         </div>
         {% endfor %}
     </div>
 
     <script>
-        const sidebarWidth = "250px";
-
         function openNav() {
-            document.getElementById("mySidebar").style.width = sidebarWidth;
-            document.getElementById("main-content").style.marginLeft = sidebarWidth;
+            document.getElementById("mySidebar").style.width = "250px";
+            document.getElementById("main-content").style.marginLeft = "250px";
         }
-
         function closeNav() {
             document.getElementById("mySidebar").style.width = "0";
             document.getElementById("main-content").style.marginLeft = "0";

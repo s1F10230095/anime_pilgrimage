@@ -69,7 +69,56 @@ def post_create(request):
 
 def spot_detail(request, pk):
     spot = get_object_or_404(Spot, pk=pk)
-    return render(request, 'spots/spot_detail.html', {'spot': spot})
+    
+    # ▼▼▼ 追加：訪問済み（称号持ち）チェック ▼▼▼
+    has_visited = False
+    if request.user.is_authenticated:
+        # ログイン中のユーザーが、このスポットに関連する称号を持っているか確認
+        has_visited = UserTitle.objects.filter(
+            user=request.user, 
+            title__related_spot=spot
+        ).exists()
+    
+    return render(request, 'spots/spot_detail.html', {
+        'spot': spot,
+        'has_visited': has_visited  # テンプレートに結果を渡す
+    })
+
+@login_required
+def post_create(request):
+    # ▼▼▼ 追加：詳細画面から「spot_id」が送られてきたら受け取る ▼▼▼
+    initial_data = {}
+    spot_id = request.GET.get('spot_id')
+    if spot_id:
+        spot = get_object_or_404(Spot, pk=spot_id)
+        initial_data['spot'] = spot  # フォームの初期値にセット
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('post_list')
+    else:
+        # ▼▼▼ 修正：初期値(initial)を渡してフォームを作る ▼▼▼
+        form = PostForm(initial=initial_data)
+        
+    return render(request, 'spots/post_form.html', {'form': form})
+
+@login_required
+def toggle_favorite(request, spot_id):
+    spot = get_object_or_404(Spot, pk=spot_id)
+    
+    # すでに登録済みなら解除、なければ登録
+    if spot.favorites.filter(id=request.user.id).exists():
+        spot.favorites.remove(request.user)
+        liked = False
+    else:
+        spot.favorites.add(request.user)
+        liked = True
+        
+    return JsonResponse({'liked': liked, 'count': spot.favorites.count()})
 
 
 # --- 統合された関数群 ---
@@ -143,19 +192,55 @@ client = OpenAI(api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE)
 
 def ai_travel(request):
     ai_response = None
+    waypoints = []     # 地図描画用の座標リスト
+    waypoints_json = "[]" # JavaScriptに渡すためのJSON文字列
 
     if request.method == "POST":
         user_input = request.POST.get("user_input")
 
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system",
-                 "content": "あなたは聖地巡礼プロの旅行プランナーです。場所・移動手段・モデルコースを詳しく丁寧に提案してください。"},
-                {"role": "user", "content": user_input},
+        # 🎯 プロンプトの魔改造：JSON形式で座標を出力するように指示します
+        system_prompt = """
+        あなたはアニメ聖地巡礼のプロ旅行プランナーです。
+        ユーザーの要望に合わせて、具体的で最適な旅行プランを提案してください。
+        
+        【重要】出力は必ず以下のJSON形式のみにしてください。冒頭の挨拶や余計な会話は不要です。
+        {
+            "plan_text": "ここに旅行プランの詳細な説明文（マークダウン形式推奨）を書く。時間は具体的に。",
+            "waypoints": [
+                {"name": "出発地点の場所名", "lat": 緯度(数値), "lng": 経度(数値)},
+                {"name": "1つ目の経由地", "lat": 緯度, "lng": 経度},
+                {"name": "...", "lat": ..., "lng": ...},
+                {"name": "ゴール地点", "lat": ..., "lng": ...}
             ]
-        )
+        }
+        ※ 座標（lat, lng）はあなたの知識から可能な限り正確な数値を推測して入れてください。
+        """
 
-        ai_response = response.choices[0].message.content
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_input},
+                ],
+                # JSONモードを有効化（これで確実にJSONが返ってきます）
+                response_format={"type": "json_object"} 
+            )
 
-    return render(request, "spots/ai_travel.html", {"ai_response": ai_response})
+            # AIの返答を辞書データに変換
+            content = response.choices[0].message.content
+            data = json.loads(content)
+            
+            ai_response = data.get("plan_text", "")
+            waypoints = data.get("waypoints", [])
+            waypoints_json = json.dumps(waypoints) # JS用に文字列化
+
+        except Exception as e:
+            ai_response = f"エラーが発生しました: {str(e)}"
+            waypoints = []
+
+    return render(request, "spots/ai_travel.html", {
+        "ai_response": ai_response,
+        "waypoints": waypoints,
+        "waypoints_json": waypoints_json
+    })

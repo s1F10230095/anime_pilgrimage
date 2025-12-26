@@ -4,14 +4,16 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .forms import ProfileForm
 
+# ▼▼▼ 追加：他のアプリ(spots)から称号モデルを読み込む ▼▼▼
+from spots.models import UserTitle 
+
 def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # 登録と同時にログイン状態にする
             login(request, user)
-            return redirect('home')  # 登録後の移動先（トップページなど）
+            return redirect('home')
     else:
         form = UserCreationForm()
     
@@ -20,7 +22,19 @@ def signup(request):
 @login_required
 def profile_detail(request):
     profile = request.user.profile
-    return render(request, 'accounts/profile_detail.html', {'profile': profile})
+    
+    # 称号リスト
+    user_titles = UserTitle.objects.filter(user=request.user).select_related('title').order_by('-obtained_at')
+
+    # ▼▼▼ 追加：お気に入りした聖地リストを取得 ▼▼▼
+    favorite_spots = request.user.favorite_spots.all()
+
+    context = {
+        'profile': profile,
+        'user_titles': user_titles,
+        'favorite_spots': favorite_spots, # ← 追加
+    }
+    return render(request, 'accounts/profile_detail.html', context)
 
 @login_required
 def profile_edit(request):
@@ -35,4 +49,3 @@ def profile_edit(request):
         form = ProfileForm(instance=profile)
 
     return render(request, 'accounts/profile_edit.html', {'form': form})
-
