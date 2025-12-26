@@ -18,12 +18,25 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+# ▼ 追加: 翻訳機能用のURLパターンを使うためのインポート
+from django.conf.urls.i18n import i18n_patterns 
 
+# ▼ 1. まずは言語切り替え機能のURLを定義します（これは翻訳対象外）
 urlpatterns = [
+    path('i18n/', include('django.conf.urls.i18n')),
+]
+
+# ▼ 2. 翻訳したいURLを i18n_patterns で囲んで追加します
+urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),
     path('', include('spots.urls')),
     path('accounts/', include('accounts.urls')),
-]
+    
+    # prefix_default_language=False にすると、
+    # 日本語(デフォルト)の時は /ja/ がつかず、英語の時だけ /en/ がつくようになります
+    prefix_default_language=False
+)
 
+# ▼ 3. 画像表示用の設定（開発モード時のみ）
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

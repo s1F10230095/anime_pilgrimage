@@ -1,20 +1,16 @@
 {% load static %}
-<!DOCTYPE html>
+{% load i18n %} <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>聖地一覧</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>{% trans "聖地一覧" %}</title> <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     {% include 'spots/sidebar.html' %}
     <div id="main-content" class="main-content">
-        <h1>聖地一覧</h1>
-        <form method="get" class="form-container" style="margin-bottom: 30px; padding: 15px;">
-            <label>ジャンル：</label>
-            <select name="genre" onchange="this.form.submit()" style="margin: 0; width: auto;">
-                <option value="">すべて</option>
-                {% for g in genres %}
+        <h1>{% trans "聖地一覧" %}</h1> <form method="get" class="form-container" style="margin-bottom: 30px; padding: 15px;">
+            <label>{% trans "ジャンル：" %}</label> <select name="genre" onchange="this.form.submit()" style="margin: 0; width: auto;">
+                <option value="">{% trans "すべて" %}</option> {% for g in genres %}
                 <option value="{{ g }}" {% if g == selected_genre %}selected{% endif %}>{{ g }}</option>
                 {% endfor %}
             </select>

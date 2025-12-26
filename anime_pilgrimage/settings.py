@@ -56,6 +56,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -161,4 +162,18 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok-free.dev',  # ← これが重要！(.devを追加)
     'https://nonintermittently-wheatless-dimple.ngrok-free.dev',
     'https://*.onrender.com',
+]
+
+
+from django.utils.translation import gettext_lazy as _
+
+# 対応する言語のリスト
+LANGUAGES = [
+    ('ja', _('Japanese')),
+    ('en', _('English')),
+]
+
+# 翻訳ファイルの保存場所
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
 ]

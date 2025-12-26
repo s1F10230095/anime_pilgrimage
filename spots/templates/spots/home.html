@@ -1,26 +1,36 @@
 {% load static %}
-<!DOCTYPE html>
+{% load i18n %} <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>アニメ聖地巡礼</title>
+    <title>{% trans "アニメ聖地巡礼" %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <div class="main-content" style="text-align: center;">
-        <h1>簡単に聖地巡礼を始めよう！</h1>
+    {% include 'spots/sidebar.html' %} <div class="main-content" style="text-align: center;">
+        <h1>{% trans "簡単に聖地巡礼を始めよう！" %}</h1>
+        
         <div class="form-container">
             {% if user.is_authenticated %}
-                <p style="margin-bottom: 20px;">おかえりなさい、<b>{{ user.username }}</b> さん</p>
-                <a href="{% url 'spot_list' %}" class="btn">スタート</a>
+                <p style="margin-bottom: 20px;">
+                    {% trans "おかえりなさい、" %}<b>{{ user.username }}</b> {% trans "さん" %}
+                </p>
+                <a href="{% url 'spot_list' %}" class="btn">{% trans "スタート" %}</a>
             {% else %}
                 <div style="display: flex; justify-content: center; gap: 10px;">
-                    <a href="{% url 'spot_list' %}" class="btn">ゲストで始める</a>
-                    <a href="{% url 'login' %}" class="btn" style="background-color: #fff; color: #111;">ログイン</a>
+                    <a href="{% url 'spot_list' %}" class="btn">{% trans "ゲストで始める" %}</a>
+                    <a href="{% url 'login' %}" class="btn" style="background-color: #fff; color: #111;">{% trans "ログイン" %}</a>
                 </div>
-                <p style="margin-top: 20px;"><a href="{% url 'signup' %}">新規登録はこちら</a></p>
+                <p style="margin-top: 20px;">
+                    <a href="{% url 'signup' %}">{% trans "新規登録はこちら" %}</a>
+                </p>
             {% endif %}
         </div>
     </div>
+    
+    <script>
+        function openNav() { document.getElementById("mySidebar").style.width = "250px"; document.body.style.marginLeft = "250px"; }
+        function closeNav() { document.getElementById("mySidebar").style.width = "0"; document.body.style.marginLeft = "0"; }
+    </script>
 </body>
 </html>

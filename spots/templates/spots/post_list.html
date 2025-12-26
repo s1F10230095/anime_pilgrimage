@@ -1,9 +1,9 @@
 {% load static %}
-<!DOCTYPE html>
+{% load i18n %} <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>投稿一覧 - アニメ聖地巡礼</title>
+    <title>{% trans "投稿一覧" %} - {% trans "アニメ聖地巡礼" %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
         /* 投稿カードのデザイン */
@@ -65,10 +65,10 @@
     {% include 'spots/sidebar.html' %}
 
     <div id="main-content" class="main-content">
-        <h1>みんなの巡礼記録</h1>
+        <h1>{% trans "みんなの巡礼記録" %}</h1>
 
         <div style="text-align: right; margin-bottom: 20px;">
-            <a href="{% url 'post_create' %}" class="btn">＋ 新規投稿する</a>
+            <a href="{% url 'post_create' %}" class="btn">{% trans "＋ 新規投稿する" %}</a>
         </div>
 
         {% for post in posts %}
@@ -95,28 +95,22 @@
             </div>
 
             {% if post.image %}
-                <img src="{{ post.image.url }}" alt="投稿画像" class="post-image">
+                <img src="{{ post.image.url }}" alt="{% trans '投稿画像' %}" class="post-image">
             {% endif %}
 
         </div>
         {% empty %}
         <div class="form-container" style="text-align: center;">
-            <p>まだ投稿がありません。</p>
-            <p>一番乗りで投稿してみましょう！</p>
-            <a href="{% url 'post_create' %}" class="btn" style="margin-top: 15px;">投稿する</a>
+            <p>{% trans "まだ投稿がありません。" %}</p>
+            <p>{% trans "一番乗りで投稿してみましょう！" %}</p>
+            <a href="{% url 'post_create' %}" class="btn" style="margin-top: 15px;">{% trans "投稿する" %}</a>
         </div>
         {% endfor %}
     </div>
 
     <script>
-        function openNav() {
-            document.getElementById("mySidebar").style.width = "250px";
-            document.getElementById("main-content").style.marginLeft = "250px";
-        }
-        function closeNav() {
-            document.getElementById("mySidebar").style.width = "0";
-            document.getElementById("main-content").style.marginLeft = "0";
-        }
+        function openNav() { document.getElementById("mySidebar").style.width = "250px"; document.getElementById("main-content").style.marginLeft = "250px"; }
+        function closeNav() { document.getElementById("mySidebar").style.width = "0"; document.getElementById("main-content").style.marginLeft = "0"; }
     </script>
 </body>
 </html>

@@ -1,16 +1,16 @@
 {% load static %}
-<!DOCTYPE html>
+{% load i18n %} <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>新規投稿 - アニメ聖地巡礼</title>
+    <title>{% trans "新規投稿" %} - {% trans "アニメ聖地巡礼" %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     {% include 'spots/sidebar.html' %}
 
     <div id="main-content" class="main-content">
-        <h1>新規投稿</h1>
+        <h1>{% trans "新規投稿" %}</h1>
 
         <div class="form-container">
             <form method="post" enctype="multipart/form-data">
@@ -18,7 +18,7 @@
 
                 {% if form.errors %}
                     <div style="background-color: #ffdddd; color: #d8000c; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #d8000c;">
-                        <h3 style="margin: 0 0 10px 0; font-size: 16px;">⚠️ 投稿できませんでした</h3>
+                        <h3 style="margin: 0 0 10px 0; font-size: 16px;">{% trans "⚠️ 投稿できませんでした" %}</h3>
                         <ul style="margin: 0; padding-left: 20px;">
                             {% for field in form %}
                                 {% for error in field.errors %}
@@ -31,29 +31,24 @@
                         </ul>
                     </div>
                 {% endif %}
+                
                 <div class="django-form">
                     {{ form.as_p }}
                 </div>
                 
-                <button type="submit" style="width: 100%; margin-top: 20px;">投稿する</button>
+                <button type="submit" style="width: 100%; margin-top: 20px;">{% trans "投稿する" %}</button>
             </form>
 
             <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
             <div style="text-align: center;">
-                <a href="{% url 'post_list' %}">← 投稿一覧に戻る</a>
+                <a href="{% url 'post_list' %}">{% trans "← 投稿一覧に戻る" %}</a>
             </div>
         </div>
     </div>
 
     <script>
-        function openNav() {
-            document.getElementById("mySidebar").style.width = "250px";
-            document.getElementById("main-content").style.marginLeft = "250px";
-        }
-        function closeNav() {
-            document.getElementById("mySidebar").style.width = "0";
-            document.getElementById("main-content").style.marginLeft = "0";
-        }
+        function openNav() { document.getElementById("mySidebar").style.width = "250px"; document.getElementById("main-content").style.marginLeft = "250px"; }
+        function closeNav() { document.getElementById("mySidebar").style.width = "0"; document.getElementById("main-content").style.marginLeft = "0"; }
     </script>
 </body>
 </html>
