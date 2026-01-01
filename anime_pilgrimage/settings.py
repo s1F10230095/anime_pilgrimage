@@ -126,13 +126,13 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # 1. CSSがある場所を具体的に指定する
 STATICFILES_DIRS = [
-    BASE_DIR / 'spots' / 'static',
+    BASE_DIR / 'spots' / 'assets',
 ]
 
 # 2. 自動検出をOFFにして、上の指定だけを使うようにする（これで重複エラーを防ぎます）
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    # 'django.contrib.staticfiles.finders.AppDirectoriesFinder', # ← これを無効化することで重複を防ぐ
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder', # ← これを無効化することで重複を防ぐ
 ]
 
 # Default primary key field type
