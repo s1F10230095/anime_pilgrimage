@@ -48,7 +48,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # ❌ WhiteNoise は削除しました（Cloudinaryに任せるため不要）
+    # WhiteNoise は削除済み
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -138,7 +138,7 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# ▼▼▼ ストレージ設定の切り替え ▼▼▼
+# ▼▼▼ ストレージ設定 ▼▼▼
 if not DEBUG:
     # 🔴 本番環境 (Render)
     # 画像もCSSもすべてCloudinaryにアップロードして配信します
@@ -150,9 +150,11 @@ if not DEBUG:
             "BACKEND": "cloudinary_storage.storage.StaticHashedCloudinaryStorage",
         },
     }
+    # ★重要: ライブラリのエラー回避のため、古い変数にも同じ値をセットします
+    STATICFILES_STORAGE = "cloudinary_storage.storage.StaticHashedCloudinaryStorage"
 else:
     # 🟢 開発環境 (ローカル)
-    # 画像はCloudinary（データ共有のため）、CSSはローカルファイルを使用（高速化）
+    # 画像はCloudinary、CSSはローカルファイルを使用
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
@@ -161,6 +163,8 @@ else:
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
+    # ★重要: ローカル用の設定も古い変数に合わせておきます
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
