@@ -122,8 +122,18 @@ STATIC_URL = 'static/'
 # 本番環境でCSSを集める場所（重要）
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# 開発環境でCSSを置く場所
-STATICFILES_DIRS = []
+# ▼▼▼ 修正個所：ここを書き換えてください ▼▼▼
+
+# 1. CSSがある場所を具体的に指定する
+STATICFILES_DIRS = [
+    BASE_DIR / 'spots' / 'static',
+]
+
+# 2. 自動検出をOFFにして、上の指定だけを使うようにする（これで重複エラーを防ぎます）
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    # 'django.contrib.staticfiles.finders.AppDirectoriesFinder', # ← これを無効化することで重複を防ぐ
+]
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
