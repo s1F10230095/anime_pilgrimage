@@ -47,9 +47,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # ★ WhiteNoise (CSS用)
+    'whitenoise.middleware.WhiteNoiseMiddleware', # ★ WhiteNoise (これがあれば配信はされます)
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',  # 多言語対応用
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -117,10 +117,10 @@ LOCALE_PATHS = [
 
 
 # Static files (CSS, JavaScript, Images)
-# ★★★【重要修正】先頭にスラッシュをつけて絶対パスにします ★★★
+# ★★★ ここは '/static/' (スラッシュあり) のままにしてください ★★★
 STATIC_URL = '/static/'
 
-# 本番環境でCSSを集める場所（重要）
+# 本番環境でCSSを集める場所
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # 1. 探してほしい場所を定義
@@ -131,7 +131,7 @@ STATICFILES_DIRS = [
     ASSETS_PATH,
 ]
 
-# 3. 自動検出機能はON（管理画面用）
+# 3. 自動検出機能はON
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -144,19 +144,19 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# ▼▼▼ ストレージ設定 (Manifestなしの安全構成) ▼▼▼
+# ▼▼▼ 【重要】圧縮機能をオフにして、標準機能に戻します ▼▼▼
+# これにより FileNotFoundError や MissingFileError は確実に回避できます。
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    # ★ CompressedStaticFilesStorage を使用 (Manifestは使いません)
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
-# Cloudinaryライブラリのエラー回避用（中身はWhiteNoiseを指定）
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+# Cloudinaryライブラリのエラー回避用（標準機能を使います）
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
