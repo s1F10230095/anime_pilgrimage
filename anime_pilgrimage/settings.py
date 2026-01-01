@@ -177,16 +177,16 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# ▼▼▼ 新しいストレージ設定 (Django 4.2以降 / 5.x 対応) ▼▼▼
 STORAGES = {
-    # メディアファイル（画像）は Cloudinary へ（ここはそのまま）
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    # ★【変更】静的ファイル（CSS）は「標準のDjango機能」を使います
+    # ★【変更】Manifest を削除して CompressedStaticFilesStorage にします
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# ▼▼▼ 古い設定の方も合わせます ▼▼▼
+# ★【変更】ここも Manifest を削除
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
