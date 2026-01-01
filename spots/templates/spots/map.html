@@ -5,330 +5,125 @@
     <meta charset="UTF-8">
     <title>アニメ聖地マップ</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="{% static 'spots/map.css' %}">
+    
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
     <style>
-        body { margin: 0; font-family: Arial, sans-serif; }
-        /* サイドバー */
-        .sidebar {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            background-color: #333;
-            overflow-x: hidden;
-            transition: 0.3s;
-            padding-top: 60px;
-            z-index: 1000;
-        }
-        .sidebar a {
-            padding: 10px 20px;
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            display: block;
-            transition: 0.2s;
-        }
-        .sidebar a:hover {
-            background-color: #575757;
-        }
-
-        /* メニューを開くボタン */
-        .openbtn {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            font-size: 20px;
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 4px;
-            z-index: 1100;
-        }
-        .openbtn:hover { background-color: #444; }
-
-        /* メイン */
+        /* 念のための追加スタイル */
+        body { margin: 0; }
+        
         .main-content {
             margin-left: 0;
-            padding-top: 50px;
+            padding-top: 60px;
             transition: margin-left 0.3s;
+            min-height: 100vh;
         }
 
-        #map { height: 600px; }
-
-        /* CSS修正：セミコロン(;)を追加しました */
         .popup-img {
             width: 150px;
             height: auto;
             display: block;
             margin-bottom: 5px;
+            border-radius: 4px;
+        }
+        
+        .user-menu-container {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            z-index: 2000;
+        }
+        .user-menu-btn {
+            background: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            border: 1px solid #555;
+        }
+        .user-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: #222;
+            color: #fff;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            margin-top: 8px;
+            width: 180px;
+            border: 1px solid #444;
+        }
+        .user-menu a, .user-menu button {
+            display: block;
+            padding: 10px;
+            text-align: left;
+            width: 100%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #fff;
+            text-decoration: none;
+        }
+        .user-menu a:hover, .user-menu button:hover {
+            background: #333;
         }
     </style>
 
-    <style>
-    /* 右上ユーザーメニュー全体 */
-    .user-menu-container {
-        position: fixed;
-        top: 10px;
-        right: 20px;
-        z-index: 2000;
-    }
-
-    /* メニューを開くボタン */
-    .user-menu-btn {
-        background: #333;
-        color: #fff;
-        padding: 8px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        border: none;
-    }
-
-    /* メニュー本体 */
-    .user-menu {
-        display: none;
-        position: absolute;
-        right: 0;
-        background: #fff;
-        color: #333;
-        border-radius: 6px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        margin-top: 8px;
-        width: 180px;
-    }
-
-    .user-menu a, .user-menu button {
-        display: block;
-        padding: 10px;
-        text-align: left;
-        width: 100%;
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: #333;
-        text-decoration: none;
-    }
-
-    .user-menu a:hover,
-    .user-menu button:hover {
-        background: #f1f1f1;
-    }
-</style>
-
-<div class="user-menu-container">
-    <button class="user-menu-btn" onclick="toggleUserMenu()">
-        {% if user.is_authenticated %}
-            👤 {{ user.username }}
-        {% else %}
-            ログイン
-        {% endif %}
-    </button>
-    <div id="userMenu" class="user-menu">
-    {% if user.is_authenticated %}
-        
-        <!-- アイコン表示 -->
-        {% if profile and profile.icon %}
-            <div style="text-align:center; padding:10px;">
-                <img src="{{ profile.icon.url }}" alt="icon"
-                     style="width:60px; height:60px; border-radius:50%;">
-            </div>
-        {% endif %}
-
-        <!-- 自己紹介表示 -->
-        {% if profile and profile.bio %}
-            <div style="padding:10px; font-size: 13px; color: #555;">
-                {{ profile.bio }}
-            </div>
-        {% endif %}
-
-        <a href="{% url 'profile_edit' %}">プロフィール編集</a>
-
-        <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit" style="color: red;">ログアウト</button>
-        </form>
-
-    {% else %}
-        <a href="{% url 'login' %}">ログイン</a>
-        <a href="{% url 'signup' %}">新規登録</a>
-    {% endif %}
-</div>
-
-    <div id="userMenu" class="user-menu">
-        {% if user.is_authenticated %}
-            <a href="{% url 'profile_edit' %}">プロフィール編集</a>
-
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit" style="color: red;">ログアウト</button>
-            </form>
-        {% else %}
-            <a href="{% url 'login' %}">ログイン</a>
-            <a href="{% url 'signup' %}">新規登録</a>
-        {% endif %}
-    </div>
-</div>
-
-<script>
-function toggleUserMenu() {
-    const menu = document.getElementById("userMenu");
-    menu.style.display = (menu.style.display === "block") ? "none" : "block";
-}
-</script>
-
+    <script>
+        function toggleUserMenu() {
+            const menu = document.getElementById("userMenu");
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+        }
+    </script>
 </head>
 
 <body>
 
-    <button class="openbtn" onclick="openNav()">☰ メニュー</button>
+    {% include 'spots/sidebar.html' %}
 
-    <div id="mySidebar" class="sidebar">
-        <a href="javascript:void(0)" onclick="closeNav()">✖ 閉じる</a>
-        <a href="{% url 'home' %}">ホーム</a>
-        <a href="{% url 'spot_list' %}">聖地一覧</a>
-        <a href="{% url 'map' %}">マップ</a>
-        <a href="{% url 'post_list' %}">投稿一覧</a>
-        <a href="{% url 'post_create' %}">新規投稿</a>
-        <a href="#">このサイトについて</a>
-        
-        {% include 'spots/sidebar.html' %}
+    <div class="user-menu-container">
+        <button class="user-menu-btn" onclick="toggleUserMenu()">
+            {% if user.is_authenticated %}
+                👤 {{ user.username }}
+            {% else %}
+                ログイン
+            {% endif %}
+        </button>
+        <div id="userMenu" class="user-menu">
+            {% if user.is_authenticated %}
+                {% if profile and profile.icon %}
+                    <div style="text-align:center; padding:10px;">
+                        <img src="{{ profile.icon.url }}" alt="icon" style="width:60px; height:60px; border-radius:50%; object-fit: cover;">
+                    </div>
+                {% endif %}
+                <a href="{% url 'profile_edit' %}">プロフィール編集</a>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" style="color: #ff4444;">ログアウト</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">ログイン</a>
+                <a href="{% url 'signup' %}">新規登録</a>
+            {% endif %}
+        </div>
     </div>
 
     <div id="main-content" class="main-content">
         <h1>アニメ聖地マップ</h1>
-        <div id="map"></div>
+        
+        <div id="map" style="height: 600px; width: 100%; border-radius: 10px; border: 2px solid #333; z-index: 1;"></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        const sidebarWidth = "250px";
-
+        // ======== サイドバー開閉処理 ========
         function openNav() {
-            document.getElementById("mySidebar").style.width = sidebarWidth;
-            document.getElementById("main-content").style.marginLeft = sidebarWidth;
-            setTimeout(() => { map.invalidateSize(); }, 350);
+            document.getElementById("mySidebar").style.width = "250px";
+            document.getElementById("main-content").style.marginLeft = "250px";
+            setTimeout(() => { if(map) map.invalidateSize(); }, 350);
         }
-
         function closeNav() {
             document.getElementById("mySidebar").style.width = "0";
-            document.getElementById("main-content").style.marginLeft = "0";
-            setTimeout(() => { map.invalidateSize(); }, 350);
-        }
-
-        // ======== 地図の初期化 ========
-        const map = L.map('map').setView([35.681236, 139.767125], 5);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        // ======== スポットのマーカー表示 ========
-        const spots = [
-          {% for spot in spots %}
-            {
-              image_url: "{{ spot.image_url|escapejs }}",
-              title: "{{ spot.title|escapejs }}",
-              location: "{{ spot.location|escapejs }}",
-              description: "{{ spot.description|escapejs }}",
-              latitude: {{ spot.latitude }},
-              longitude: {{ spot.longitude }}
-            }{% if not forloop.last %},{% endif %}
-          {% endfor %}
-        ];
-
-        spots.forEach(function(spot) {
-          const popupContent = `
-            <img src="${spot.image_url}" alt="画像" class="popup-img">
-            <strong>${spot.title}</strong><br>
-            ${spot.location}<br>
-            ${spot.description}
-          `;
-          L.marker([spot.latitude, spot.longitude])
-            .addTo(map)
-            .bindPopup(popupContent);
-        });
-
-        // ======== 🔍 URLパラメータから spot の位置を読み取る ========
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetLat = urlParams.get("lat");
-        const targetLng = urlParams.get("lng");
-
-        if (targetLat && targetLng) {
-            const spotLat = parseFloat(targetLat);
-            const spotLng = parseFloat(targetLng);
-            map.setView([spotLat, spotLng], 14);
-            const highlightMarker = L.marker([spotLat, spotLng]).addTo(map);
-            highlightMarker.bindPopup("📍選択された聖地").openPopup();
-        }
-
-        // ======== 🏆 称号判定用の関数（ここを追加！） ========
-        function sendLocationToServer(lat, lon) {
-            fetch('/api/check-location/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    latitude: lat,
-                    longitude: lon
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // 成功し、かつ新しい称号がある場合のみアラートを出す
-                if (data.status === 'success' && data.new_titles && data.new_titles.length > 0) {
-                    alert("🎉 おめでとうございます！\n聖地に到達しました！\n\n獲得した称号：\n" + data.new_titles.join(", "));
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        // ======== ✅ 現在地を表示する処理 ========
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-
-                    // 現在地アイコン
-                    const userIcon = L.icon({
-                        iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
-                        iconSize: [30, 30],
-                        iconAnchor: [15, 30],
-                        popupAnchor: [0, -25]
-                    });
-
-                    // 現在地マーカー追加
-                    const userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
-                    userMarker.bindPopup("📍あなたの現在地").openPopup();
-
-                    // 中心を現在地に移動
-                    map.setView([lat, lng], 13);
-
-                    // 現在地の範囲を円で表示（任意）
-                    L.circle([lat, lng], {
-                        radius: 250, // 判定エリアと同じ250mに合わせておくとわかりやすいです
-                        color: '#ff4444',
-                        fillColor: '#ff4444',
-                        fillOpacity: 0.1
-                    }).addTo(map);
-
-                    // ★ ここでサーバーに位置情報を送信して称号判定！
-                    sendLocationToServer(lat, lng);
-                },
-                function(error) {
-                    console.warn("位置情報の取得に失敗しました:", error.message);
-                }
-            );
-        } else {
-            alert("お使いのブラウザは位置情報に対応していません。");
-        }
-    </script>
-
-</body>
-</html>
+            document.getElementById("
