@@ -148,15 +148,14 @@ CLOUDINARY_STORAGE = {
 
 # ▼▼▼ 新しいストレージ設定 (Django 4.2以降 / 5.x 対応) ▼▼▼
 STORAGES = {
-    # メディアファイル（画像）は Cloudinary へ
+    # メディアファイル（画像）は Cloudinary へ（ここはそのまま）
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    # 静的ファイル（CSS）は WhiteNoise へ
-    # ★【修正】Manifest を削除しました
+    # ★【変更】静的ファイル（CSS）は「標準のDjango機能」を使います
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
