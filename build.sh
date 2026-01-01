@@ -2,5 +2,8 @@
 set -o errexit
 
 pip install -r requirements.txt
-python manage.py collectstatic --no-input
+
+# --clear を追加して、古いキャッシュを削除してから集め直します
+python manage.py collectstatic --no-input --clear
+
 python manage.py migrate

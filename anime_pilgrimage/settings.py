@@ -6,7 +6,7 @@ import os
 import dj_database_url
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
-from dotenv import load_dotenv # ローカルで.envを読み込む用
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -117,7 +117,8 @@ LOCALE_PATHS = [
 
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+# ★★★【重要修正】先頭にスラッシュをつけて絶対パスにします ★★★
+STATIC_URL = '/static/'
 
 # 本番環境でCSSを集める場所（重要）
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -136,28 +137,26 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
-# ★★★ ログに正解を表示させる仕掛け ★★★
-print("--------------------------------------------------")
-print(f"DEBUG: Djangoが探している場所: {ASSETS_PATH}")
+# Cloudinary Settings
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
 
-if ASSETS_PATH.exists():
-    print("DEBUG: ✅ フォルダを発見しました！")
-    try:
-        # フォルダの中身をリストアップして表示
-        print(f"DEBUG: フォルダの中身: {os.listdir(ASSETS_PATH)}")
-        
-        # さらに css フォルダの中身も確認
-        css_path = ASSETS_PATH / 'css'
-        if css_path.exists():
-             print(f"DEBUG: cssフォルダの中身: {os.listdir(css_path)}")
-        else:
-             print("DEBUG: ⚠️ 'css' フォルダが見当たりません！")
-    except Exception as e:
-        print(f"DEBUG: エラー発生: {e}")
-else:
-    print("DEBUG: ❌ フォルダが見つかりません... (パスが間違っています)")
-    print(f"DEBUG: 現在のBASE_DIR: {BASE_DIR}")
-print("--------------------------------------------------")
+# ▼▼▼ ストレージ設定 (Manifestなしの安全構成) ▼▼▼
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    # ★ CompressedStaticFilesStorage を使用 (Manifestは使いません)
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
+
+# Cloudinaryライブラリのエラー回避用（中身はWhiteNoiseを指定）
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -169,24 +168,3 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok-free.dev',
     'https://*.onrender.com',
 ]
-
-# Cloudinary Settings
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
-}
-
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    # ★【変更】Manifest を削除して CompressedStaticFilesStorage にします
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-    },
-}
-
-# ▼▼▼ 古い設定の方も合わせます ▼▼▼
-# ★【変更】ここも Manifest を削除
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
