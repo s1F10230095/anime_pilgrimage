@@ -185,8 +185,6 @@ STORAGES = {
     },
     # ★【変更】静的ファイル（CSS）は「標準のDjango機能」を使います
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
