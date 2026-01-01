@@ -33,13 +33,14 @@ else:
 
 # Application definition
 INSTALLED_APPS = [
+    # ★重要: CloudinaryStorageは必ず django.contrib.staticfiles より前に記述
+    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',  # Cloudinary用
-    'cloudinary',          # Cloudinary用
+    'cloudinary',
     'django.contrib.staticfiles',
     'spots',
     'accounts',
@@ -47,7 +48,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # ★ WhiteNoise (これがあれば配信はされます)
+    # ❌ WhiteNoise は削除しました（Cloudinaryに任せるため不要）
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -117,21 +118,14 @@ LOCALE_PATHS = [
 
 
 # Static files (CSS, JavaScript, Images)
-# ★★★ ここは '/static/' (スラッシュあり) のままにしてください ★★★
 STATIC_URL = '/static/'
-
-# 本番環境でCSSを集める場所
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# 1. 探してほしい場所を定義
 ASSETS_PATH = BASE_DIR / 'spots' / 'assets'
-
-# 2. 設定にセット
 STATICFILES_DIRS = [
     ASSETS_PATH,
 ]
 
-# 3. 自動検出機能はON
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -144,19 +138,29 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# ▼▼▼ 【重要】圧縮機能をオフにして、標準機能に戻します ▼▼▼
-# これにより FileNotFoundError や MissingFileError は確実に回避できます。
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
-
-# Cloudinaryライブラリのエラー回避用（標準機能を使います）
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+# ▼▼▼ ストレージ設定の切り替え ▼▼▼
+if not DEBUG:
+    # 🔴 本番環境 (Render)
+    # 画像もCSSもすべてCloudinaryにアップロードして配信します
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "cloudinary_storage.storage.StaticHashedCloudinaryStorage",
+        },
+    }
+else:
+    # 🟢 開発環境 (ローカル)
+    # 画像はCloudinary（データ共有のため）、CSSはローカルファイルを使用（高速化）
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
