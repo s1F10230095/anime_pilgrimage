@@ -124,7 +124,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # 開発環境でCSSを置く場所
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / 'spots' / 'static',
 ]
 
 # Default primary key field type
