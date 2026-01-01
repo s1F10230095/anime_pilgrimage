@@ -123,9 +123,7 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # 開発環境でCSSを置く場所
-STATICFILES_DIRS = [
-    BASE_DIR / 'spots' / 'static',
-]
+STATICFILES_DIRS = []
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
