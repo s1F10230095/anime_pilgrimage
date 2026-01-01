@@ -122,20 +122,43 @@ STATIC_URL = 'static/'
 # 本番環境でCSSを集める場所（重要）
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# ▼▼▼ 修正個所：ここを書き換えてください ▼▼▼
+# 1. 探してほしい場所を定義
+ASSETS_PATH = BASE_DIR / 'spots' / 'assets'
 
-# 1. CSSがある場所を具体的に指定する
+# 2. 設定にセット
 STATICFILES_DIRS = [
-    BASE_DIR / 'spots' / 'assets',
+    ASSETS_PATH,
 ]
 
-# 2. 自動検出をOFFにして、上の指定だけを使うようにする（これで重複エラーを防ぎます）
+# 3. 自動検出機能はON（管理画面用）
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder', # ← これを無効化することで重複を防ぐ
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
-# Default primary key field type
+# ★★★ ログに正解を表示させる仕掛け ★★★
+print("--------------------------------------------------")
+print(f"DEBUG: Djangoが探している場所: {ASSETS_PATH}")
+
+if ASSETS_PATH.exists():
+    print("DEBUG: ✅ フォルダを発見しました！")
+    try:
+        # フォルダの中身をリストアップして表示
+        print(f"DEBUG: フォルダの中身: {os.listdir(ASSETS_PATH)}")
+        
+        # さらに css フォルダの中身も確認
+        css_path = ASSETS_PATH / 'css'
+        if css_path.exists():
+             print(f"DEBUG: cssフォルダの中身: {os.listdir(css_path)}")
+        else:
+             print("DEBUG: ⚠️ 'css' フォルダが見当たりません！")
+    except Exception as e:
+        print(f"DEBUG: エラー発生: {e}")
+else:
+    print("DEBUG: ❌ フォルダが見つかりません... (パスが間違っています)")
+    print(f"DEBUG: 現在のBASE_DIR: {BASE_DIR}")
+print("--------------------------------------------------")
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'home'
