@@ -34,7 +34,6 @@
         function openNav() {
             document.getElementById("mySidebar").style.width = "250px";
             document.getElementById("main-content").style.marginLeft = "250px";
-            // 地図があればサイズ調整
             if (typeof map !== 'undefined') { setTimeout(() => { map.invalidateSize(); }, 350); }
         }
         function closeNav() {
@@ -58,6 +57,11 @@
         </button>
         <div id="userMenu" class="user-menu">
             {% if user.is_authenticated %}
+                {% if profile and profile.icon %}
+                    <div style="text-align:center; padding:10px;">
+                        <img src="{{ profile.icon.url }}" alt="icon" style="width:60px; height:60px; border-radius:50%; object-fit: cover;">
+                    </div>
+                {% endif %}
                 <a href="{% url 'profile_edit' %}">プロフィール編集</a>
                 <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" style="color: #ff4444;">ログアウト</button></form>
             {% else %}
@@ -79,14 +83,13 @@
         var map = L.map('map').setView([35.681236, 139.767125], 5);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
 
-        // ★★★ ここが修正ポイント！ データエラーを防ぐ書き方 ★★★
+        // データエラー対策済みスポットデータ
         const spots = [
           {% for spot in spots %}
             {
               title: "{{ spot.title|escapejs }}",
               location: "{{ spot.location|escapejs }}",
               description: "{{ spot.description|escapejs }}",
-              // もし値が空なら 0 を入れる (|default:0)
               latitude: {{ spot.latitude|default:0 }},
               longitude: {{ spot.longitude|default:0 }},
               image_url: "{{ spot.image_url|default:''|escapejs }}"
@@ -94,9 +97,7 @@
           {% endfor %}
         ];
 
-        // マーカー設置ループ
         spots.forEach(function(spot) {
-            // 緯度経度が0の場合はスキップ（表示しない）
             if (spot.latitude === 0 && spot.longitude === 0) return;
 
             let popupContent = `<strong>${spot.title}</strong><br>${spot.location}`;
