@@ -1,9 +1,10 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <title>アニメ聖地マップ</title>
+    <title>{% trans "アニメ聖地マップ" %}</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
@@ -53,7 +54,11 @@
 
     <div class="user-menu-container">
         <button class="user-menu-btn" onclick="toggleUserMenu()">
-            {% if user.is_authenticated %}👤 {{ user.username }}{% else %}ログイン{% endif %}
+            {% if user.is_authenticated %}
+                👤 {{ user.username }}
+            {% else %}
+                {% trans "ログイン" %}
+            {% endif %}
         </button>
         <div id="userMenu" class="user-menu">
             {% if user.is_authenticated %}
@@ -62,17 +67,20 @@
                         <img src="{{ profile.icon.url }}" alt="icon" style="width:60px; height:60px; border-radius:50%; object-fit: cover;">
                     </div>
                 {% endif %}
-                <a href="{% url 'profile_edit' %}">プロフィール編集</a>
-                <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" style="color: #ff4444;">ログアウト</button></form>
+                <a href="{% url 'profile_edit' %}">{% trans "プロフィール編集" %}</a>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" style="color: #ff4444;">{% trans "ログアウト" %}</button>
+                </form>
             {% else %}
-                <a href="{% url 'login' %}">ログイン</a>
-                <a href="{% url 'signup' %}">新規登録</a>
+                <a href="{% url 'login' %}">{% trans "ログイン" %}</a>
+                <a href="{% url 'signup' %}">{% trans "新規登録" %}</a>
             {% endif %}
         </div>
     </div>
 
     <div id="main-content" class="main-content">
-        <h1>アニメ聖地マップ</h1>
+        <h1>{% trans "アニメ聖地マップ" %}</h1>
         <div id="map" style="height: 600px; width: 100%; border-radius: 10px; border: 2px solid #333; z-index: 1;"></div>
     </div>
 
@@ -81,7 +89,9 @@
     <script>
         // 地図の初期化
         var map = L.map('map').setView([35.681236, 139.767125], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+            attribution: '© OpenStreetMap contributors' 
+        }).addTo(map);
 
         // データエラー対策済みスポットデータ
         const spots = [
@@ -113,7 +123,7 @@
         const lng = parseFloat(urlParams.get("lng"));
         if (!isNaN(lat) && !isNaN(lng)) {
             map.setView([lat, lng], 14);
-            L.marker([lat, lng]).addTo(map).bindPopup("📍 選択された聖地").openPopup();
+            L.marker([lat, lng]).addTo(map).bindPopup("📍 {% trans '選択された聖地' %}").openPopup();
         }
 
         // 現在地処理
@@ -128,7 +138,7 @@
                         iconAnchor: [15, 30],
                         popupAnchor: [0, -25]
                     });
-                    L.marker([uLat, uLng], {icon: icon}).addTo(map).bindPopup("📍 現在地").openPopup();
+                    L.marker([uLat, uLng], {icon: icon}).addTo(map).bindPopup("📍 {% trans '現在地' %}").openPopup();
                 },
                 function(err) { console.log("位置情報取得エラー: " + err.message); }
             );

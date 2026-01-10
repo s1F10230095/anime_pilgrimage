@@ -1,16 +1,17 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <title>プロフィール編集 - アニメ聖地巡礼</title>
+    <title>{% trans "プロフィール編集" %} - {% trans "アニメ聖地巡礼" %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     {% include 'spots/sidebar.html' %}
 
     <div id="main-content" class="main-content">
-        <h1>プロフィール編集</h1>
+        <h1>{% trans "プロフィール編集" %}</h1>
 
         <div class="form-container">
             <form method="POST" enctype="multipart/form-data">
@@ -18,10 +19,10 @@
                 <div class="django-form">
                     {{ form.as_p }}
                 </div>
-                <button type="submit" style="width: 100%; margin-top: 20px;">変更を保存する</button>
+                <button type="submit" style="width: 100%; margin-top: 20px;">{% trans "変更を保存する" %}</button>
             </form>
             <div style="text-align: center; margin-top: 20px;">
-                <a href="{% url 'profile_detail' %}">キャンセルして戻る</a>
+                <a href="{% url 'profile_detail' %}">{% trans "キャンセルして戻る" %}</a>
             </div>
         </div>
     </div>

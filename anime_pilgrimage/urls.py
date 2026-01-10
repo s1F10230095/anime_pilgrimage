@@ -34,7 +34,7 @@ urlpatterns += i18n_patterns(
     
     # prefix_default_language=False にすると、
     # 日本語(デフォルト)の時は /ja/ がつかず、英語の時だけ /en/ がつくようになります
-    prefix_default_language=False
+    prefix_default_language=True
 )
 
 # ▼ 3. 画像表示用の設定（開発モード時のみ）

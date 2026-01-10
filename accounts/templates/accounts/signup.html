@@ -1,14 +1,15 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <title>新規登録 - アニメ聖地巡礼</title>
+    <title>{% trans "新規登録" %} - {% trans "アニメ聖地巡礼" %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
     <div class="main-content">
-        <h1>新規アカウント登録</h1>
+        <h1>{% trans "新規アカウント登録" %}</h1>
 
         <div class="form-container">
             <form method="post">
@@ -16,15 +17,15 @@
                 <div class="django-form">
                     {{ form.as_p }}
                 </div>
-                <button type="submit" style="width: 100%; margin-top: 10px;">登録を実行する</button>
+                <button type="submit" style="width: 100%; margin-top: 10px;">{% trans "登録を実行する" %}</button>
             </form>
 
             <p style="margin-top: 25px; text-align: center; font-size: 0.9em;">
-                すでにアカウントをお持ちですか？ <br>
-                <a href="{% url 'login' %}" style="font-weight: bold;">ログインはこちら</a>
+                {% trans "すでにアカウントをお持ちですか？" %} <br>
+                <a href="{% url 'login' %}" style="font-weight: bold;">{% trans "ログインはこちら" %}</a>
             </p>
             <div style="text-align: center; margin-top: 15px;">
-                <a href="{% url 'home' %}" style="color: #888;">ホームへ戻る</a>
+                <a href="{% url 'home' %}" style="color: #888;">{% trans "ホームへ戻る" %}</a>
             </div>
         </div>
     </div>
