@@ -1,0 +1,109 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ profile_user.username }} - {% trans "プロフィール" %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    {% include 'spots/sidebar.html' %}
+
+    <div class="main-content">
+        <h1>{% trans "プロフィール" %}</h1>
+
+        <div class="form-container" style="text-align: center; max-width: 600px; margin: 0 auto;">
+
+            {% if profile and profile.icon %}
+                <img src="{{ profile.icon.url }}"
+                     style="width: 120px; height: 120px; border-radius: 50%;
+                     border: 3px solid #00bcd4; margin-bottom: 20px; object-fit: cover;">
+            {% else %}
+                <div style="width: 120px; height: 120px; border-radius: 50%;
+                    border: 3px solid #555; background: #333; margin: 0 auto 20px;
+                    display: flex; align-items: center; justify-content: center; color: #aaa;">
+                    {% trans "No Image" %}
+                </div>
+            {% endif %}
+
+            <p style="font-size: 1.5rem; margin-bottom: 10px;">
+                <strong>{{ profile_user.username }}</strong>
+            </p>
+
+            <div style="margin: 20px 0; background: #2a2a2a;
+                padding: 20px; border-radius: 8px; text-align: left;">
+                <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 5px;">
+                    {% trans "自己紹介" %}
+                </p>
+
+                {% if profile and profile.bio %}
+                    {{ profile.bio|linebreaks }}
+                {% else %}
+                    <p style="color: #777;">
+                        {% trans "自己紹介はまだありません。" %}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- 称号 -->
+            <div style="margin: 30px 0; text-align: left;">
+                <h3 style="border-bottom: 2px solid #00bcd4;
+                    padding-bottom: 5px; color: #fff; display: inline-block;">
+                    🏆 {% trans "獲得した称号" %}
+                </h3>
+
+                {% if user_titles %}
+                    <ul style="list-style: none; padding: 0; margin-top: 15px;">
+                        {% for item in user_titles %}
+                            <li style="background: #222; color: #fff; padding: 15px;
+                                margin-bottom: 10px; border-left: 5px solid #00bcd4;
+                                border-radius: 4px; display: flex;
+                                justify-content: space-between; align-items: center;">
+                                <span style="font-weight: bold;">
+                                    {{ item.title.name }}
+                                </span>
+                                <span style="font-size: 0.8em; color: #aaa;">
+                                    {{ item.obtained_at|date:"Y/m/d" }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="color: #aaa; margin-top: 10px;">
+                        {% trans "まだ称号を獲得していません。" %}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- お気に入り -->
+            <div style="margin: 30px 0; text-align: left;">
+                <h3 style="border-bottom: 2px solid #ff4081;
+                    padding-bottom: 5px; color: #fff; display: inline-block;">
+                    ❤️ {% trans "お気に入りの聖地" %}
+                </h3>
+
+                {% if favorite_spots %}
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 15px;">
+                        {% for spot in favorite_spots %}
+                            <div style="width: 150px; background: #222; border-radius: 8px;">
+                                <div style="padding: 10px;">
+                                    <a href="{% url 'spot_detail' spot.pk %}"
+                                       style="color: white; text-decoration: none; font-weight: bold;">
+                                        {{ spot.title }}
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: #aaa; margin-top: 10px;">
+                        {% trans "まだお気に入りの聖地はありません。" %}
+                    </p>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

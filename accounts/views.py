@@ -49,3 +49,25 @@ def profile_edit(request):
         form = ProfileForm(instance=profile)
 
     return render(request, 'accounts/profile_edit.html', {'form': form})
+
+# accounts/views.py
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
+from spots.models import UserTitle
+
+def profile_public(request, username):
+    profile_user = get_object_or_404(User, username=username)
+    profile = getattr(profile_user, 'profile', None)
+
+    user_titles = UserTitle.objects.filter(
+        user=profile_user
+    ).select_related('title').order_by('-obtained_at')
+
+    favorite_spots = profile_user.favorite_spots.all()
+
+    return render(request, 'accounts/profile_public.html', {
+        'profile_user': profile_user,
+        'profile': profile,
+        'user_titles': user_titles,
+        'favorite_spots': favorite_spots,
+    })
