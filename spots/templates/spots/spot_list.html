@@ -16,21 +16,30 @@
             </select>
         </form>
 
-        {% for spot in spots %}
+        {% for work in works %}
         <div class="spot">
-            <div class="spot-image-container" style="flex: 1;">
-                {% if spot.image_url %}
-                    <img src="{{ spot.image_url }}" alt="{{ spot.title }}">
-                {% else %}
-                    <div style="height: 150px; background: #333; border-radius: 8px; display: flex; align-items: center; justify-content: center;">No Image</div>
-                {% endif %}
-            </div>
-            <div class="spot-info-container" style="flex: 2;">
-                <h2><a href="{% url 'spot_detail' spot.pk %}">{{ spot.title }}</a></h2>
-                <p>📍 {{ spot.location }}</p>
-                <p style="color: #00bcd4;">#{{ spot.spot_type }}</p>
-            </div>
+    <div class="spot-image-container" style="flex: 1;">
+        {# とりあえず画像なし。後で work.image を追加できる #}
+        <div style="height: 150px; background: #333; border-radius: 8px;
+                    display: flex; align-items: center; justify-content: center;">
+            Anime Image
         </div>
+    </div>
+
+    <div class="spot-info-container" style="flex: 2;">
+        <h2>
+            <a href="{% url 'work_detail' work.id %}">
+                {{ work.title }}
+            </a>
+        </h2>
+
+        <p>{{ work.description|default:"作品説明はまだありません" }}</p>
+
+        <p style="color: #00bcd4;">
+            聖地数：{{ work.spots.count }} 件
+        </p>
+    </div>
+</div>
         {% endfor %}
     </div>
     <script>

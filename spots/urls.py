@@ -11,5 +11,6 @@ urlpatterns = [
     path('api/check-location/', views.check_location, name='check_location'),
     path('ai_travel/', views.ai_travel, name='ai_travel'),
     path('favorite/<int:spot_id>/', views.toggle_favorite, name='toggle_favorite'),
+    path('works/<int:work_id>/', views.work_detail, name='work_detail'),
     ]
 

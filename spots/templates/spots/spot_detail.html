@@ -60,6 +60,21 @@
             {% if spot.latitude %}
             <a href="{% url 'map' %}?lat={{ spot.latitude }}&lng={{ spot.longitude }}" class="btn">🌏 マップで見る</a>
             {% endif %}
+
+            <hr style="margin: 30px 0;">
+
+            <h2>この作品の他の聖地</h2>
+            <ul>
+            {% for s in spot.work.spots.all %}
+                {% if s.id != spot.id %}
+                    <li>
+                        <a href="{% url 'spot_detail' s.id %}">
+                            {{ s.location }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            </ul>
         </div>
         <a href="{% url 'spot_list' %}">← 聖地一覧に戻る</a>
     </div>

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Spot, Post, Title, UserTitle, Profile
+from .models import Spot, Post, Title, UserTitle, Profile, Work
 from .forms import PostForm, ProfileForm
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
@@ -16,28 +16,9 @@ def home(request):
     return render(request, 'spots/home.html', {'spots': spots})
 
 def spot_list(request):
-    selected_genre = request.GET.get('genre', '')
-    raw_genres = Spot.objects.values_list('spot_type', flat=True)
-    genre_set = set()
-
-    for g in raw_genres:
-        if g:
-            parts = [p.strip() for p in g.replace('、', ',').replace('　', ',').replace(' ', ',').split(',')]
-            for p in parts:
-                if p:
-                    genre_set.add(p)
-
-    genres = sorted(genre_set)
-
-    if selected_genre:
-        spots = Spot.objects.filter(Q(spot_type__icontains=selected_genre))
-    else:
-        spots = Spot.objects.all()
-
+    works = Work.objects.all()
     return render(request, 'spots/spot_list.html', {
-        'spots': spots,
-        'genres': genres,
-        'selected_genre': selected_genre,
+        'works': works,
     })
 
 def map_view(request):
@@ -217,4 +198,13 @@ def ai_travel(request):
         "ai_response": ai_response,
         "waypoints": waypoints,
         "waypoints_json": waypoints_json
+    })
+
+def work_detail(request, work_id):
+    work = get_object_or_404(Work, id=work_id)
+    spots = work.spots.all()
+
+    return render(request, 'spots/work_detail.html', {
+        'work': work,
+        'spots': spots,
     })
