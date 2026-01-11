@@ -40,3 +40,6 @@ urlpatterns += i18n_patterns(
 # ▼ 3. 画像表示用の設定（開発モード時のみ）
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# anime_pilgrimage/urls.py
+path('', include('accounts.urls')),

@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Spot, Post, Title, UserTitle, Profile
-from .forms import PostForm, ProfileForm
+from .models import Spot, Post, Title, UserTitle
+from accounts.models import Profile
+from .forms import PostForm
+from accounts.models import Profile
+from accounts.forms import ProfileForm
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -160,10 +163,10 @@ def check_location(request):
 # キーを直接書かないでください！
 OPENAI_API_BASE = "https://api.openai.iniad.org/api/v1"
 
-client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY"), # .env または Renderの設定から読み込みます
-    base_url=OPENAI_API_BASE
-)
+#client = OpenAI(
+    #api_key=os.environ.get("OPENAI_API_KEY"), # .env または Renderの設定から読み込みます
+    #base_url=OPENAI_API_BASE
+#)
 # ▲▲▲ 修正ここまで ▲▲▲
 
 
@@ -217,4 +220,15 @@ def ai_travel(request):
         "ai_response": ai_response,
         "waypoints": waypoints,
         "waypoints_json": waypoints_json
+    })
+
+def user_profile(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    profile = get_object_or_404(Profile, user=user)
+    posts = Post.objects.filter(author=user).order_by('-created_at')
+
+    return render(request, 'spots/user_profile.html', {
+        'profile_user': user,
+        'profile': profile,
+        'posts': posts,
     })
