@@ -106,6 +106,42 @@
         {% if post.image %}
             <img src="{{ post.image.url }}" alt="{% trans '投稿画像' %}" class="post-image">
         {% endif %}
+        <form action="{% url 'post_like' post.id %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <button style="background:none; border:none; color:#ff4081;">
+        ❤️ {{ post.likes.count }}
+    </button>
+</form>
+
+<div style="margin-top:15px;">
+    <h4>💬 返信</h4>
+
+    {% for comment in post.comments.all %}
+        <p>
+            <strong>{{ comment.author.username }}</strong>
+            {{ comment.content }}
+        </p>
+    {% empty %}
+        <p style="color:#777;">返信はまだありません</p>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+    <form method="post" action="{% url 'post_comment' post.id %}">
+        {% csrf_token %}
+        <input type="text" name="content" placeholder="返信を書く" required>
+        <button type="submit">送信</button>
+    </form>
+    {% endif %}
+</div>
+{% if user == post.author %}
+<form method="post" action="{% url 'post_delete' post.id %}">
+    {% csrf_token %}
+    <button style="color:red; background:none; border:none;">
+        🗑 削除
+    </button>
+</form>
+{% endif %}
+
     </div>
     {% empty %}
     <div class="form-container" style="text-align: center;">

@@ -25,15 +25,27 @@ class Spot(models.Model):
 
 # ユーザーの投稿（巡礼記録）モデル
 class Post(models.Model):
-    spot = models.ForeignKey(Spot, on_delete=models.CASCADE, related_name='posts', null=True, blank=True) 
+    spot = models.ForeignKey(
+        Spot,
+        on_delete=models.CASCADE,
+        related_name='posts',
+        null=True,
+        blank=True
+    )
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    likes = models.ManyToManyField(
+        User,
+        related_name='liked_posts',
+        blank=True
+    )
+
     def __str__(self):
         return f"{self.author.username} - {self.spot.title if self.spot else 'No Spot'}"
-    
+
 # 投稿へのコメントモデル
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')

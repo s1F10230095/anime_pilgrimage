@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Spot, Post, Title, UserTitle
+from .models import Spot, Post, Comment, Title, UserTitle
 from accounts.models import Profile
 from .forms import PostForm
 from accounts.models import Profile
@@ -232,3 +232,41 @@ def user_profile(request, user_id):
         'profile': profile,
         'posts': posts,
     })
+
+@login_required
+def toggle_post_like(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+
+    return redirect('post_list')
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+
+    if request.method == "POST":
+        content = request.POST.get("content")
+        if content:
+            Comment.objects.create(
+                post=post,
+                author=request.user,
+                content=content
+            )
+
+    return redirect('post_list')
+
+@login_required
+def post_delete(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+
+    if post.author != request.user:
+        return redirect('post_list')
+
+    if request.method == "POST":
+        post.delete()
+
+    return redirect('post_list')
