@@ -1,5 +1,6 @@
 {% load static %}
-{% load i18n %} <!DOCTYPE html>
+{% load i18n %}
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -7,48 +8,67 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    {% include 'spots/sidebar.html' %}
 
-    <div id="main-content" class="main-content">
-        <h1>{% trans "新規投稿" %}</h1>
+{% include 'spots/sidebar.html' %}
 
-        <div class="form-container">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
+<div id="main-content" class="main-content">
+    <h1>{% trans "新規投稿" %}</h1>
 
-                {% if form.errors %}
-                    <div style="background-color: #ffdddd; color: #d8000c; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #d8000c;">
-                        <h3 style="margin: 0 0 10px 0; font-size: 16px;">{% trans "⚠️ 投稿できませんでした" %}</h3>
-                        <ul style="margin: 0; padding-left: 20px;">
-                            {% for field in form %}
-                                {% for error in field.errors %}
-                                    <li><b>{{ field.label }}:</b> {{ error }}</li>
-                                {% endfor %}
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if form.errors %}
+                <div style="background:#ffdddd;color:#d8000c;padding:15px;border-radius:5px;margin-bottom:20px;">
+                    <strong>{% trans "⚠️ 投稿できませんでした" %}</strong>
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>{{ field.label }}：{{ error }}</li>
                             {% endfor %}
-                            {% for error in form.non_field_errors %}
-                                <li>{{ error }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
-                
-                <div class="django-form">
-                    {{ form.as_p }}
+                        {% endfor %}
+                    </ul>
                 </div>
-                
-                <button type="submit" style="width: 100%; margin-top: 20px;">{% trans "投稿する" %}</button>
-            </form>
+            {% endif %}
 
-            <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
-            <div style="text-align: center;">
-                <a href="{% url 'post_list' %}">{% trans "← 投稿一覧に戻る" %}</a>
+            <div class="django-form">
+                <p>
+                    <label>{% trans "聖地（ハッシュタグ）" %}</label><br>
+                    {{ form.spot }}
+                    <small style="color:#aaa;">
+                        {% trans "※ 選択した聖地は #タグ として表示されます" %}
+                    </small>
+                </p>
+
+                {{ form.text.label_tag }}
+                {{ form.text }}
+
+                {{ form.image.label_tag }}
+                {{ form.image }}
             </div>
+
+            <button type="submit" style="width:100%;margin-top:20px;">
+                {% trans "投稿する" %}
+            </button>
+        </form>
+
+        <hr>
+        <div style="text-align:center;">
+            <a href="{% url 'post_list' %}">← {% trans "投稿一覧に戻る" %}</a>
         </div>
     </div>
+</div>
 
-    <script>
-        function openNav() { document.getElementById("mySidebar").style.width = "250px"; document.getElementById("main-content").style.marginLeft = "250px"; }
-        function closeNav() { document.getElementById("mySidebar").style.width = "0"; document.getElementById("main-content").style.marginLeft = "0"; }
-    </script>
+<script>
+function openNav() {
+    document.getElementById("mySidebar").style.width = "250px";
+    document.getElementById("main-content").style.marginLeft = "250px";
+}
+function closeNav() {
+    document.getElementById("mySidebar").style.width = "0";
+    document.getElementById("main-content").style.marginLeft = "0";
+}
+</script>
+
 </body>
 </html>
