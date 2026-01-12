@@ -1,10 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
-# ▼▼▼ モデルのインポートを統合 (Workはitoから、Commentはmainから) ▼▼▼
-from .models import Spot, Post, Comment, Title, UserTitle, Work
-# Profileは main の構成(accountsアプリ)を正とします
+# ▼▼▼ Visit を追加しました ▼▼▼
+from .models import Spot, Post, Comment, Title, UserTitle, Work, Visit
 from accounts.models import Profile 
 from django.contrib.auth.models import User
-# フォームのインポートを統合
 from .forms import PostForm
 from accounts.forms import ProfileForm
 
@@ -17,6 +15,8 @@ from openai import OpenAI
 import json
 import os 
 
+# --- 基本ビュー ---
+
 def home(request):
     spots = Spot.objects.all()
     return render(request, 'spots/home.html', {'spots': spots})
@@ -24,13 +24,11 @@ def home(request):
 def spot_list(request):
     selected_genre = request.GET.get('genre', '')
 
-    # Work.genre からジャンル一覧を作る（空は除外）
     raw_genres = Work.objects.values_list('genre', flat=True)
     genre_set = set()
 
     for g in raw_genres:
         if g:
-            # 「SF, 日常」みたいに複数入れても分解できるようにする
             parts = [p.strip() for p in g.replace('、', ',').replace('　', ',').replace(' ', ',').split(',')]
             for p in parts:
                 if p:
@@ -38,7 +36,6 @@ def spot_list(request):
 
     genres = sorted(genre_set)
 
-    # ジャンルで絞り込み
     if selected_genre:
         works = Work.objects.filter(genre__icontains=selected_genre)
     else:
@@ -54,14 +51,14 @@ def map_view(request):
     spots = Spot.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True)
     return render(request, 'spots/map.html', {'spots': spots})
 
+# --- 投稿関連 ---
+
 def post_list(request):
     posts = Post.objects.all().order_by('-created_at')
     return render(request, 'spots/post_list.html', {'posts': posts})
 
-
 @login_required
 def post_create(request):
-    # 詳細画面から「spot_id」が送られてきたら受け取る
     initial_data = {}
     spot_id = request.GET.get('spot_id')
     if spot_id:
@@ -73,7 +70,6 @@ def post_create(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            # URLから聖地が指定されていたら強制的に紐付ける
             if spot_id:
                  post.spot = get_object_or_404(Spot, pk=spot_id)
             post.save()
@@ -83,17 +79,46 @@ def post_create(request):
         
     return render(request, 'spots/post_form.html', {'form': form})
 
+@login_required
+def post_delete(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if post.author != request.user:
+        return redirect('post_list')
+    if request.method == "POST":
+        post.delete()
+    return redirect('post_list')
+
+@login_required
+def toggle_post_like(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+    return redirect('post_list')
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if request.method == "POST":
+        content = request.POST.get("content")
+        if content:
+            Comment.objects.create(
+                post=post,
+                author=request.user,
+                content=content
+            )
+    return redirect('post_list')
+
+# --- 詳細・お気に入り ---
+
 def spot_detail(request, pk):
     spot = get_object_or_404(Spot, pk=pk)
 
+    # 訪問済み(スタンプあり)か判定
     has_visited = False
     if request.user.is_authenticated:
-        # Spot → 紐づく Work で称号を判定する
-        if spot.work:
-            has_visited = UserTitle.objects.filter(
-                user=request.user,
-                title__related_work=spot.work
-            ).exists()
+        has_visited = Visit.objects.filter(user=request.user, spot=spot).exists()
 
     return render(request, 'spots/spot_detail.html', {
         'spot': spot,
@@ -113,8 +138,7 @@ def toggle_favorite(request, spot_id):
         
     return JsonResponse({'liked': liked, 'count': spot.favorites.count()})
 
-
-# --- 統合された関数群 ---
+# --- プロフィール ---
 
 @login_required
 def edit_profile(request):
@@ -133,10 +157,22 @@ def profile_view(request):
     profile = request.user.profile
     return render(request, 'spots/profile_view.html', {'profile': profile})
 
+def user_profile(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    profile = get_object_or_404(Profile, user=user)
+    posts = Post.objects.filter(author=user).order_by('-created_at')
+
+    return render(request, 'spots/user_profile.html', {
+        'profile_user': user,
+        'profile': profile,
+        'posts': posts,
+    })
+
+# --- 位置情報判定 (スタンプラリー機能) ---
 
 @csrf_exempt 
 def check_location(request):
-    """ 現在地を受け取って、近くの聖地の称号を付与するAPI """
+    """ 現在地を受け取って、スタンプ(Visit)を押し、コンプリートなら称号を付与する """
     if request.method == 'POST' and request.user.is_authenticated:
         try:
             data = json.loads(request.body)
@@ -149,12 +185,40 @@ def check_location(request):
             for spot in spots:
                 distance = calculate_distance(user_lat, user_lon, spot.latitude, spot.longitude)
                 
+                # 半径250m以内ならスタンプゲット
                 if distance <= 250:
+                    # 1. 訪問記録(スタンプ)を作成
+                    # get_or_create なので、既にスタンプがあってもエラーにならず、重複もしない
+                    visit_obj, created = Visit.objects.get_or_create(user=request.user, spot=spot)
+                    
+                    if created:
+                        # 初めての訪問なら、ログに出すか何かしてもいいかも
+                        pass
+
+                    # 2. 個別の聖地称号があれば付与（もしあれば）
                     titles = Title.objects.filter(related_spot=spot)
                     for title in titles:
-                        obj, created = UserTitle.objects.get_or_create(user=request.user, title=title)
-                        if created:
+                        obj, t_created = UserTitle.objects.get_or_create(user=request.user, title=title)
+                        if t_created:
                             earned_titles.append(title.name)
+
+                    # 3. コンプリート判定（ここが新機能！）
+                    if spot.work:
+                        work = spot.work
+                        # このアニメの聖地総数
+                        all_spots_count = work.spots.count()
+                        # ユーザーが訪れたこのアニメの聖地数
+                        visited_count = Visit.objects.filter(user=request.user, spot__work=work).count()
+                        
+                        # 全て回っていたら
+                        if visited_count >= all_spots_count:
+                            # コンプリート称号（SpotがNULLでWorkが設定されている称号）を探す
+                            comp_titles = Title.objects.filter(related_work=work, related_spot__isnull=True)
+                            
+                            for ct in comp_titles:
+                                obj, c_created = UserTitle.objects.get_or_create(user=request.user, title=ct)
+                                if c_created:
+                                    earned_titles.append(f"【完全制覇】{ct.name}")
 
             if earned_titles:
                 return JsonResponse({'status': 'success', 'new_titles': earned_titles})
@@ -167,7 +231,8 @@ def check_location(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
 
 
-# 環境変数設定 (変更なし)
+# --- AI旅行プラン ---
+
 OPENAI_API_BASE = "https://api.openai.iniad.org/api/v1"
 # client = OpenAI(...) 
 
@@ -183,17 +248,14 @@ def ai_travel(request):
         あなたはアニメ聖地巡礼のプロ旅行プランナーです。
         ユーザーの要望に合わせて、具体的で最適な旅行プランを提案してください。
         
-        【重要】出力は必ず以下のJSON形式のみにしてください。冒頭の挨拶や余計な会話は不要です。
+        【重要】出力は必ず以下のJSON形式のみにしてください。
         {
-            "plan_text": "ここに旅行プランの詳細な説明文（マークダウン形式推奨）を書く。時間は具体的に。",
+            "plan_text": "説明文...",
             "waypoints": [
-                {"name": "出発地点の場所名", "lat": 緯度(数値), "lng": 経度(数値)},
-                {"name": "1つ目の経由地", "lat": 緯度, "lng": 経度},
-                {"name": "...", "lat": ..., "lng": ...},
-                {"name": "ゴール地点", "lat": ..., "lng": ...}
+                {"name": "場所名", "lat": 緯度, "lng": 経度},
+                ...
             ]
         }
-        ※ 座標（lat, lng）はあなたの知識から可能な限り正確な数値を推測して入れてください。
         """
 
         try:
@@ -223,62 +285,37 @@ def ai_travel(request):
         "waypoints_json": waypoints_json
     })
 
-# ▼▼▼ ito ブランチ由来の機能 (作品詳細) ▼▼▼
+
+# --- 作品詳細 (スタンプラリー台紙) ---
+
 def work_detail(request, work_id):
     work = get_object_or_404(Work, id=work_id)
-    spots = work.spots.all()
+    all_spots = work.spots.all()
+    
+    # テンプレートで「訪問済みか？」を判定しやすい形にデータを加工する
+    spot_list = []
+    for spot in all_spots:
+        is_visited = False
+        if request.user.is_authenticated:
+            # Visitモデルに記録があるかチェック
+            is_visited = Visit.objects.filter(user=request.user, spot=spot).exists()
+        
+        spot_list.append({
+            'spot': spot,
+            'is_visited': is_visited
+        })
+
+    # コンプリート済みか確認 (コンプリート称号を持っているかで判定)
+    is_completed = False
+    if request.user.is_authenticated:
+        is_completed = UserTitle.objects.filter(
+            user=request.user,
+            title__related_work=work,
+            title__related_spot__isnull=True
+        ).exists()
 
     return render(request, 'spots/work_detail.html', {
         'work': work,
-        'spots': spots,
+        'spot_list': spot_list,  # ここが重要！spotsそのものではなく、加工したリストを渡す
+        'is_completed': is_completed,
     })
-
-# ▼▼▼ main ブランチ由来の機能 (SNS/ユーザープロフィール) ▼▼▼
-def user_profile(request, user_id):
-    user = get_object_or_404(User, pk=user_id)
-    profile = get_object_or_404(Profile, user=user)
-    posts = Post.objects.filter(author=user).order_by('-created_at')
-
-    return render(request, 'spots/user_profile.html', {
-        'profile_user': user,
-        'profile': profile,
-        'posts': posts,
-    })
-
-@login_required
-def toggle_post_like(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-
-    if request.user in post.likes.all():
-        post.likes.remove(request.user)
-    else:
-        post.likes.add(request.user)
-
-    return redirect('post_list')
-
-@login_required
-def add_comment(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-
-    if request.method == "POST":
-        content = request.POST.get("content")
-        if content:
-            Comment.objects.create(
-                post=post,
-                author=request.user,
-                content=content
-            )
-
-    return redirect('post_list')
-
-@login_required
-def post_delete(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-
-    if post.author != request.user:
-        return redirect('post_list')
-
-    if request.method == "POST":
-        post.delete()
-
-    return redirect('post_list')

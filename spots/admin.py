@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Spot, Post, Comment, Title, UserTitle, Work
+# ▼▼▼ Visit を追加しました ▼▼▼
+from .models import Spot, Post, Comment, Title, UserTitle, Work, Visit
 
 
 # --- Work（作品）管理画面 ---
@@ -24,3 +25,4 @@ admin.site.register(Post)
 admin.site.register(Comment)
 admin.site.register(Title)
 admin.site.register(UserTitle)
+admin.site.register(Visit)

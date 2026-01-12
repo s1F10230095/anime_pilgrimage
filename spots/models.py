@@ -86,6 +86,15 @@ class Title(models.Model):
         related_name='titles'
     )
 
+    related_spot = models.ForeignKey(
+        Spot,
+        on_delete=models.CASCADE,
+        verbose_name="対象聖地",
+        null=True,   # 空欄OK（コンプリート称号用）
+        blank=True,  # フォームで空欄OK
+        related_name='titles'
+    )
+
     def __str__(self):
         return f"{self.name}（{self.related_work.title}）"
     
@@ -100,3 +109,24 @@ class UserTitle(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.title.name}"
+    
+# ユーザーが聖地を訪れた記録（スタンプ）モデル
+class Visit(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='visits'
+    )
+    spot = models.ForeignKey(
+        Spot, 
+        on_delete=models.CASCADE, 
+        related_name='visits'
+    )
+    visited_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # 同じ場所に何度もスタンプは押さない（1ユーザー1聖地につき1回まで）
+        unique_together = ('user', 'spot')
+
+    def __str__(self):
+        return f"{self.user.username} visited {self.spot.location}"
