@@ -1,15 +1,21 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Spot, Post, Title, UserTitle, Profile, Work
-from .forms import PostForm, ProfileForm
+# ▼▼▼ モデルのインポートを統合 (Workはitoから、Commentはmainから) ▼▼▼
+from .models import Spot, Post, Comment, Title, UserTitle, Work
+# Profileは main の構成(accountsアプリ)を正とします
+from accounts.models import Profile 
+from django.contrib.auth.models import User
+# フォームのインポートを統合
+from .forms import PostForm
+from accounts.forms import ProfileForm
+
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
 from .utils import calculate_distance
 from openai import OpenAI
 import json
-import os  # ▼▼▼ 追加: 環境変数を読み込むために必要です ▼▼▼
+import os 
 
 def home(request):
     spots = Spot.objects.all()
@@ -161,16 +167,9 @@ def check_location(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
 
 
-# ▼▼▼ 修正箇所：環境変数からAPIキーを読み込むように変更 ▼▼▼
-# キーを直接書かないでください！
+# 環境変数設定 (変更なし)
 OPENAI_API_BASE = "https://api.openai.iniad.org/api/v1"
-
-client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY"), # .env または Renderの設定から読み込みます
-    base_url=OPENAI_API_BASE
-)
-# ▲▲▲ 修正ここまで ▲▲▲
-
+# client = OpenAI(...) 
 
 def ai_travel(request):
     ai_response = None
@@ -224,6 +223,7 @@ def ai_travel(request):
         "waypoints_json": waypoints_json
     })
 
+# ▼▼▼ ito ブランチ由来の機能 (作品詳細) ▼▼▼
 def work_detail(request, work_id):
     work = get_object_or_404(Work, id=work_id)
     spots = work.spots.all()
@@ -232,3 +232,53 @@ def work_detail(request, work_id):
         'work': work,
         'spots': spots,
     })
+
+# ▼▼▼ main ブランチ由来の機能 (SNS/ユーザープロフィール) ▼▼▼
+def user_profile(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    profile = get_object_or_404(Profile, user=user)
+    posts = Post.objects.filter(author=user).order_by('-created_at')
+
+    return render(request, 'spots/user_profile.html', {
+        'profile_user': user,
+        'profile': profile,
+        'posts': posts,
+    })
+
+@login_required
+def toggle_post_like(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+
+    return redirect('post_list')
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+
+    if request.method == "POST":
+        content = request.POST.get("content")
+        if content:
+            Comment.objects.create(
+                post=post,
+                author=request.user,
+                content=content
+            )
+
+    return redirect('post_list')
+
+@login_required
+def post_delete(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+
+    if post.author != request.user:
+        return redirect('post_list')
+
+    if request.method == "POST":
+        post.delete()
+
+    return redirect('post_list')

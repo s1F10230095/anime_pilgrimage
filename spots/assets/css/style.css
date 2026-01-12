@@ -120,33 +120,42 @@ input:focus, textarea:focus, select:focus {
 }
 
 /* -------------------- 5. サイドバー設定 -------------------- */
+/* ===== Sidebar ===== */
 .sidebar {
-    height: 100%;
-    width: 0;
     position: fixed;
-    z-index: 2000;
     top: 0;
     left: 0;
+
+    height: 100%;
+    width: 0;               /* 初期は完全に閉じる */
+    max-width: 250px;       /* 最大幅を固定 */
+
     background-color: #111;
+    z-index: 2000;
+
     overflow-x: hidden;
-    transition: 0.5s;
+    overflow-y: auto;       /* 縦スクロールだけ許可 */
+
+    transition: width 0.5s ease;
     padding-top: 60px;
-    border-right: 1px solid #333;
+
+    box-sizing: border-box; /* ← これが超重要 */
 }
 
+/* リンク */
 .sidebar a {
     padding: 10px 32px;
     text-decoration: none;
     font-size: 18px;
     color: #818181;
     display: block;
-    transition: 0.3s;
 }
 
 .sidebar a:hover {
     color: #ff4081;
     background-color: #1a1a1a;
 }
+
 
 .openbtn {
     font-size: 20px;
@@ -237,4 +246,11 @@ input:focus, textarea:focus, select:focus {
     #map {
         height: 350px;
     }
+}
+
+/* ==== 横スクロール完全禁止 ==== */
+html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
 }
