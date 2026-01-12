@@ -16,9 +16,32 @@ def home(request):
     return render(request, 'spots/home.html', {'spots': spots})
 
 def spot_list(request):
-    works = Work.objects.all()
+    selected_genre = request.GET.get('genre', '')
+
+    # Work.genre からジャンル一覧を作る（空は除外）
+    raw_genres = Work.objects.values_list('genre', flat=True)
+    genre_set = set()
+
+    for g in raw_genres:
+        if g:
+            # 「SF, 日常」みたいに複数入れても分解できるようにする
+            parts = [p.strip() for p in g.replace('、', ',').replace('　', ',').replace(' ', ',').split(',')]
+            for p in parts:
+                if p:
+                    genre_set.add(p)
+
+    genres = sorted(genre_set)
+
+    # ジャンルで絞り込み
+    if selected_genre:
+        works = Work.objects.filter(genre__icontains=selected_genre)
+    else:
+        works = Work.objects.all()
+
     return render(request, 'spots/spot_list.html', {
         'works': works,
+        'genres': genres,
+        'selected_genre': selected_genre,
     })
 
 def map_view(request):
@@ -56,15 +79,16 @@ def post_create(request):
 
 def spot_detail(request, pk):
     spot = get_object_or_404(Spot, pk=pk)
-    
-    # 訪問済み（称号持ち）チェック
+
     has_visited = False
     if request.user.is_authenticated:
-        has_visited = UserTitle.objects.filter(
-            user=request.user, 
-            title__related_spot=spot
-        ).exists()
-    
+        # Spot → 紐づく Work で称号を判定する
+        if spot.work:
+            has_visited = UserTitle.objects.filter(
+                user=request.user,
+                title__related_work=spot.work
+            ).exists()
+
     return render(request, 'spots/spot_detail.html', {
         'spot': spot,
         'has_visited': has_visited

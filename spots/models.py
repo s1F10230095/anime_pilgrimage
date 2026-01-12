@@ -77,10 +77,15 @@ class Profile(models.Model):
 # 称号（アチーブメント）の定義モデル
 class Title(models.Model):
     name = models.CharField(max_length=100, verbose_name="称号名")
-    related_spot = models.ForeignKey(Spot, on_delete=models.CASCADE, verbose_name="対象スポット", related_name='titles')
-    
+    related_work = models.ForeignKey(
+        Work,
+        on_delete=models.CASCADE,
+        verbose_name="対象作品",
+        related_name='titles'
+    )
+
     def __str__(self):
-        return self.name
+        return f"{self.name}（{self.related_work.title}）"
     
 # ユーザーが獲得した称号のモデル（多対多の関係を管理）
 class UserTitle(models.Model):

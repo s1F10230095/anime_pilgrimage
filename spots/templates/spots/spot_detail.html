@@ -76,7 +76,11 @@
             {% endfor %}
             </ul>
         </div>
-        <a href="{% url 'spot_list' %}">← 聖地一覧に戻る</a>
+        {% if spot.work %}
+  <a href="{% url 'work_detail' spot.work.id %}">← 聖地一覧に戻る</a>
+{% else %}
+  <a href="{% url 'spot_list' %}">← アニメ一覧に戻る</a>
+{% endif %}
     </div>
 
     <script>

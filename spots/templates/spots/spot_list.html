@@ -8,7 +8,7 @@
 <body>
     {% include 'spots/sidebar.html' %}
     <div id="main-content" class="main-content">
-        <h1>{% trans "聖地一覧" %}</h1> <form method="get" class="form-container" style="margin-bottom: 30px; padding: 15px;">
+        <h1>{% trans "アニメ一覧" %}</h1> <form method="get" class="form-container" style="margin-bottom: 30px; padding: 15px;">
             <label>{% trans "ジャンル：" %}</label> <select name="genre" onchange="this.form.submit()" style="margin: 0; width: auto;">
                 <option value="">{% trans "すべて" %}</option> {% for g in genres %}
                 <option value="{{ g }}" {% if g == selected_genre %}selected{% endif %}>{{ g }}</option>
@@ -19,12 +19,15 @@
         {% for work in works %}
         <div class="spot">
     <div class="spot-image-container" style="flex: 1;">
-        {# とりあえず画像なし。後で work.image を追加できる #}
+    {% if work.image_url %}
+        <img src="{{ work.image_url }}" alt="{{ work.title }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+    {% else %}
         <div style="height: 150px; background: #333; border-radius: 8px;
                     display: flex; align-items: center; justify-content: center;">
-            Anime Image
+            No Image
         </div>
-    </div>
+    {% endif %}
+</div>
 
     <div class="spot-info-container" style="flex: 2;">
         <h2>

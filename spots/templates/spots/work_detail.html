@@ -32,14 +32,22 @@
                 </div>
 
                 <div class="spot-info-container" style="flex: 2;">
-                    <h2>
-                        <a href="{% url 'spot_detail' spot.id %}">
-                            {{ spot.title }}
-                        </a>
-                    </h2>
-                    <p>📍 {{ spot.location }}</p>
-                    <p style="color: #00bcd4;">#{{ spot.spot_type }}</p>
-                </div>
+    <h2>
+        <a href="{% url 'spot_detail' spot.id %}">
+            {{ spot.location }}
+        </a>
+    </h2>
+
+    <!-- ✅ 聖地の説明を表示 -->
+    <p>{{ spot.description|default:"説明はまだありません" }}</p>
+
+    <!-- ✅ マップへ直接飛ぶ（緯度経度がある時だけ） -->
+    {% if spot.latitude and spot.longitude %}
+        <a class="btn" href="{% url 'map' %}?lat={{ spot.latitude }}&lng={{ spot.longitude }}">
+            🌏 マップで見る
+        </a>
+    {% endif %}
+</div>
             </div>
         {% empty %}
             <p>まだ聖地が登録されていません。</p>
