@@ -1,18 +1,21 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Spot, Post, Comment, Title, UserTitle
-from accounts.models import Profile
+# ▼▼▼ モデルのインポートを統合 (Workはitoから、Commentはmainから) ▼▼▼
+from .models import Spot, Post, Comment, Title, UserTitle, Work
+# Profileは main の構成(accountsアプリ)を正とします
+from accounts.models import Profile 
+from django.contrib.auth.models import User
+# フォームのインポートを統合
 from .forms import PostForm
-from accounts.models import Profile
 from accounts.forms import ProfileForm
+
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
 from .utils import calculate_distance
 from openai import OpenAI
 import json
-import os  # ▼▼▼ 追加: 環境変数を読み込むために必要です ▼▼▼
+import os 
 
 def home(request):
     spots = Spot.objects.all()
@@ -20,11 +23,14 @@ def home(request):
 
 def spot_list(request):
     selected_genre = request.GET.get('genre', '')
-    raw_genres = Spot.objects.values_list('spot_type', flat=True)
+
+    # Work.genre からジャンル一覧を作る（空は除外）
+    raw_genres = Work.objects.values_list('genre', flat=True)
     genre_set = set()
 
     for g in raw_genres:
         if g:
+            # 「SF, 日常」みたいに複数入れても分解できるようにする
             parts = [p.strip() for p in g.replace('、', ',').replace('　', ',').replace(' ', ',').split(',')]
             for p in parts:
                 if p:
@@ -32,13 +38,14 @@ def spot_list(request):
 
     genres = sorted(genre_set)
 
+    # ジャンルで絞り込み
     if selected_genre:
-        spots = Spot.objects.filter(Q(spot_type__icontains=selected_genre))
+        works = Work.objects.filter(genre__icontains=selected_genre)
     else:
-        spots = Spot.objects.all()
+        works = Work.objects.all()
 
     return render(request, 'spots/spot_list.html', {
-        'spots': spots,
+        'works': works,
         'genres': genres,
         'selected_genre': selected_genre,
     })
@@ -78,15 +85,16 @@ def post_create(request):
 
 def spot_detail(request, pk):
     spot = get_object_or_404(Spot, pk=pk)
-    
-    # 訪問済み（称号持ち）チェック
+
     has_visited = False
     if request.user.is_authenticated:
-        has_visited = UserTitle.objects.filter(
-            user=request.user, 
-            title__related_spot=spot
-        ).exists()
-    
+        # Spot → 紐づく Work で称号を判定する
+        if spot.work:
+            has_visited = UserTitle.objects.filter(
+                user=request.user,
+                title__related_work=spot.work
+            ).exists()
+
     return render(request, 'spots/spot_detail.html', {
         'spot': spot,
         'has_visited': has_visited
@@ -159,16 +167,9 @@ def check_location(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
 
 
-# ▼▼▼ 修正箇所：環境変数からAPIキーを読み込むように変更 ▼▼▼
-# キーを直接書かないでください！
+# 環境変数設定 (変更なし)
 OPENAI_API_BASE = "https://api.openai.iniad.org/api/v1"
-
-#client = OpenAI(
-    #api_key=os.environ.get("OPENAI_API_KEY"), # .env または Renderの設定から読み込みます
-    #base_url=OPENAI_API_BASE
-#)
-# ▲▲▲ 修正ここまで ▲▲▲
-
+# client = OpenAI(...) 
 
 def ai_travel(request):
     ai_response = None
@@ -222,6 +223,17 @@ def ai_travel(request):
         "waypoints_json": waypoints_json
     })
 
+# ▼▼▼ ito ブランチ由来の機能 (作品詳細) ▼▼▼
+def work_detail(request, work_id):
+    work = get_object_or_404(Work, id=work_id)
+    spots = work.spots.all()
+
+    return render(request, 'spots/work_detail.html', {
+        'work': work,
+        'spots': spots,
+    })
+
+# ▼▼▼ main ブランチ由来の機能 (SNS/ユーザープロフィール) ▼▼▼
 def user_profile(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     profile = get_object_or_404(Profile, user=user)

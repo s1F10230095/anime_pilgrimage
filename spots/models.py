@@ -4,12 +4,29 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 
+# アニメ作品モデル（追加）
+class Work(models.Model):
+    title = models.CharField(max_length=100, verbose_name="作品名")
+    description = models.TextField(blank=True, verbose_name="作品説明")
+    genre = models.CharField(max_length=100, blank=True, verbose_name="ジャンル")
+    image_url = models.URLField(blank=True, verbose_name="作品画像URL")
+    representative_location = models.CharField(max_length=100, blank=True, verbose_name="代表の聖地（場所）")
+
+    def __str__(self):
+        return self.title
+
 # 聖地巡礼スポットのモデル
 class Spot(models.Model):
-    title = models.CharField(max_length=100)
+    work = models.ForeignKey(
+        Work,
+        on_delete=models.CASCADE,
+        related_name='spots',
+        verbose_name="作品",
+        null=True,
+        blank=True
+    )
     location = models.CharField(max_length=100)
     description = models.TextField()
-    spot_type = models.CharField(max_length=50)
     image_url = models.URLField(blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
@@ -21,7 +38,9 @@ class Spot(models.Model):
     )
 
     def __str__(self):
-        return self.title
+        if self.work_id:
+            return f"{self.work.title} - {self.location}"
+        return self.location
 
 # ユーザーの投稿（巡礼記録）モデル
 class Post(models.Model):
@@ -60,10 +79,15 @@ class Comment(models.Model):
 # 称号（アチーブメント）の定義モデル
 class Title(models.Model):
     name = models.CharField(max_length=100, verbose_name="称号名")
-    related_spot = models.ForeignKey(Spot, on_delete=models.CASCADE, verbose_name="対象スポット", related_name='titles')
-    
+    related_work = models.ForeignKey(
+        Work,
+        on_delete=models.CASCADE,
+        verbose_name="対象作品",
+        related_name='titles'
+    )
+
     def __str__(self):
-        return self.name
+        return f"{self.name}（{self.related_work.title}）"
     
 # ユーザーが獲得した称号のモデル（多対多の関係を管理）
 class UserTitle(models.Model):

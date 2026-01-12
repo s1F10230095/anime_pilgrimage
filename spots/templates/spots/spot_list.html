@@ -8,7 +8,7 @@
 <body>
     {% include 'spots/sidebar.html' %}
     <div id="main-content" class="main-content">
-        <h1>{% trans "聖地一覧" %}</h1> <form method="get" class="form-container" style="margin-bottom: 30px; padding: 15px;">
+        <h1>{% trans "アニメ一覧" %}</h1> <form method="get" class="form-container" style="margin-bottom: 30px; padding: 15px;">
             <label>{% trans "ジャンル：" %}</label> <select name="genre" onchange="this.form.submit()" style="margin: 0; width: auto;">
                 <option value="">{% trans "すべて" %}</option> {% for g in genres %}
                 <option value="{{ g }}" {% if g == selected_genre %}selected{% endif %}>{{ g }}</option>
@@ -16,21 +16,33 @@
             </select>
         </form>
 
-        {% for spot in spots %}
+        {% for work in works %}
         <div class="spot">
-            <div class="spot-image-container" style="flex: 1;">
-                {% if spot.image_url %}
-                    <img src="{{ spot.image_url }}" alt="{{ spot.title }}">
-                {% else %}
-                    <div style="height: 150px; background: #333; border-radius: 8px; display: flex; align-items: center; justify-content: center;">No Image</div>
-                {% endif %}
-            </div>
-            <div class="spot-info-container" style="flex: 2;">
-                <h2><a href="{% url 'spot_detail' spot.pk %}">{{ spot.title }}</a></h2>
-                <p>📍 {{ spot.location }}</p>
-                <p style="color: #00bcd4;">#{{ spot.spot_type }}</p>
-            </div>
+    <div class="spot-image-container" style="flex: 1;">
+    {% if work.image_url %}
+        <img src="{{ work.image_url }}" alt="{{ work.title }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+    {% else %}
+        <div style="height: 150px; background: #333; border-radius: 8px;
+                    display: flex; align-items: center; justify-content: center;">
+            No Image
         </div>
+    {% endif %}
+</div>
+
+    <div class="spot-info-container" style="flex: 2;">
+        <h2>
+            <a href="{% url 'work_detail' work.id %}">
+                {{ work.title }}
+            </a>
+        </h2>
+
+        <p>{{ work.description|default:"作品説明はまだありません" }}</p>
+
+        <p style="color: #00bcd4;">
+            聖地数：{{ work.spots.count }} 件
+        </p>
+    </div>
+</div>
         {% endfor %}
     </div>
     <script>

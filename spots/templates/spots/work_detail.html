@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ work.title }}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    {% include 'spots/sidebar.html' %}
+
+    <div class="main-content">
+        <h1>{{ work.title }}</h1>
+
+        {% if work.description %}
+            <p style="margin: 20px 0;">{{ work.description }}</p>
+        {% endif %}
+
+        <h2 style="margin-top: 30px;">この作品の聖地一覧</h2>
+
+        {% for spot in spots %}
+            <div class="spot">
+                <div class="spot-image-container" style="flex: 1;">
+                    {% if spot.image_url %}
+                        <img src="{{ spot.image_url }}" alt="{{ spot.title }}">
+                    {% else %}
+                        <div style="height: 150px; background: #333; border-radius: 8px;
+                                    display: flex; align-items: center; justify-content: center;">
+                            No Image
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="spot-info-container" style="flex: 2;">
+    <h2>
+        <a href="{% url 'spot_detail' spot.id %}">
+            {{ spot.location }}
+        </a>
+    </h2>
+
+    <!-- ✅ 聖地の説明を表示 -->
+    <p>{{ spot.description|default:"説明はまだありません" }}</p>
+
+    <!-- ✅ マップへ直接飛ぶ（緯度経度がある時だけ） -->
+    {% if spot.latitude and spot.longitude %}
+        <a class="btn" href="{% url 'map' %}?lat={{ spot.latitude }}&lng={{ spot.longitude }}">
+            🌏 マップで見る
+        </a>
+    {% endif %}
+</div>
+            </div>
+        {% empty %}
+            <p>まだ聖地が登録されていません。</p>
+        {% endfor %}
+
+        <a href="{% url 'spot_list' %}">← アニメ一覧に戻る</a>
+    </div>
+</body>
+</html>
