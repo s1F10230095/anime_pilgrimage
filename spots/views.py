@@ -234,7 +234,6 @@ def check_location(request):
 # --- AI旅行プラン ---
 
 OPENAI_API_BASE = "https://api.openai.iniad.org/api/v1"
-# client = OpenAI(...) 
 
 def ai_travel(request):
     ai_response = None
@@ -258,6 +257,14 @@ def ai_travel(request):
         }
         """
 
+        # ▼▼▼ 【ここを追加修正】 ▼▼▼
+        # クライアントを初期化します。INIADのエンドポイントを指定します。
+        client = OpenAI(
+            api_key=os.environ.get("OPENAI_API_KEY"), # 環境変数からキーを取得
+            base_url=OPENAI_API_BASE,                 # INIADのアドレスを指定
+        )
+        # ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
         try:
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
@@ -276,6 +283,7 @@ def ai_travel(request):
             waypoints_json = json.dumps(waypoints)
 
         except Exception as e:
+            # エラー内容を画面に出すようにしておくとデバッグしやすいです
             ai_response = f"エラーが発生しました: {str(e)}"
             waypoints = []
 
