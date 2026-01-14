@@ -1,15 +1,15 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
-    <title>{{ work.title }} - 聖地巡礼スタンプラリー</title>
+    <title>{{ work.title }} - {% trans "聖地巡礼スタンプラリー" %}</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
         /* スタンプラリー専用CSS (ダークモード対応版) */
         
         .complete-banner {
-            /* グラデーションを少し落ち着かせつつ、文字を黒にして読みやすく */
             background: linear-gradient(135deg, #FFD700, #FFA500);
             color: #000;
             padding: 20px;
@@ -25,11 +25,10 @@
             font-size: 1.5rem;
         }
         
-        /* スタンプカード (黒ベースに変更) */
         .spot-card {
             position: relative;
-            background: #1a1a1a; /* 真っ黒より少し明るいグレー */
-            border: 1px solid #333; /* 枠線を馴染ませる */
+            background: #1a1a1a;
+            border: 1px solid #333;
             border-radius: 12px;
             padding: 15px;
             margin-bottom: 20px;
@@ -37,10 +36,9 @@
             gap: 20px;
             transition: transform 0.2s;
             overflow: hidden;
-            color: #eee; /* 文字色を白系に */
+            color: #eee;
         }
 
-        /* リンクの色も白系に変更 */
         .spot-card a {
             color: #fff;
             text-decoration: none;
@@ -49,21 +47,19 @@
             text-decoration: underline;
         }
 
-        /* 訪問済みの場合 (暗い赤色の背景に) */
         .spot-card.visited {
-            border-color: #ff4757; /* 枠線を赤く */
-            background-color: #2d1212; /* ほんのり赤い黒背景 */
+            border-color: #ff4757;
+            background-color: #2d1212;
             box-shadow: 0 0 10px rgba(255, 71, 87, 0.2);
         }
 
-        /* スタンプマーク (背景を透過・暗く) */
         .stamp-mark {
             position: absolute;
             top: 10px;
             right: 10px;
             width: 80px;
             height: 80px;
-            border: 3px solid #555; /* 未訪問時はグレー */
+            border: 3px solid #555;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -72,16 +68,15 @@
             color: #555;
             transform: rotate(-15deg);
             z-index: 10;
-            background: rgba(0, 0, 0, 0.5); /* 半透明の黒 */
+            background: rgba(0, 0, 0, 0.5);
         }
 
-        /* 訪問済みのスタンプ */
         .spot-card.visited .stamp-mark {
             border-color: #ff4757;
             color: #ff4757;
             border-width: 5px;
             font-size: 1.2rem;
-            background: rgba(0, 0, 0, 0.8); /* 文字が読みやすいよう背景を濃く */
+            background: rgba(0, 0, 0, 0.8);
             animation: stampBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -96,7 +91,6 @@
             border-radius: 8px;
             border: 1px solid #333;
         }
-        /* No Image も暗くする */
         .no-image {
             height: 150px;
             background: #333;
@@ -108,12 +102,11 @@
             border: 1px solid #444;
         }
 
-        /* ボタンのデザイン微調整 */
         .btn-map {
             display: inline-block;
             padding: 6px 15px;
-            background: #0056b3; /* 少し暗めの青 */
-            color: white !important; /* 強制的に白 */
+            background: #0056b3;
+            color: white !important;
             border-radius: 5px;
             margin-top: 10px;
             font-size: 0.9rem;
@@ -123,7 +116,6 @@
             text-decoration: none !important;
         }
 
-        /* アニメーション定義 */
         @keyframes stampBounce {
             0% { transform: scale(3) rotate(-15deg); opacity: 0; }
             100% { transform: scale(1) rotate(-15deg); opacity: 1; }
@@ -138,12 +130,12 @@
     {% include 'spots/sidebar.html' %}
 
     <div class="main-content">
-        <h1>{{ work.title }} スタンプラリー</h1>
+        <h1>{{ work.title }} {% trans "スタンプラリー" %}</h1>
 
         {% if is_completed %}
             <div class="complete-banner">
-                <h2>🏆 完全制覇！おめでとうございます！</h2>
-                <p>すべての聖地を巡り、特別な称号を獲得しました。</p>
+                <h2>{% trans "🏆 完全制覇！おめでとうございます！" %}</h2>
+                <p>{% trans "すべての聖地を巡り、特別な称号を獲得しました。" %}</p>
             </div>
         {% endif %}
 
@@ -151,16 +143,16 @@
             <p style="margin: 20px 0; color: #ccc;">{{ work.description }}</p>
         {% endif %}
 
-        <h2 style="margin-top: 30px;">聖地チェックリスト</h2>
+        <h2 style="margin-top: 30px;">{% trans "聖地チェックリスト" %}</h2>
 
         {% for item in spot_list %}
             <div class="spot-card {% if item.is_visited %}visited{% endif %}">
                 
                 <div class="stamp-mark">
                     {% if item.is_visited %}
-                        <span>済</span>
+                        <span>{% trans "済" %}</span>
                     {% else %}
-                        <span style="font-size: 0.8rem;">未訪問</span>
+                        <span style="font-size: 0.8rem;">{% trans "未訪問" %}</span>
                     {% endif %}
                 </div>
 
@@ -179,21 +171,27 @@
                         </a>
                     </h3>
 
-                    <p style="color: #bbb;">{{ item.spot.description|default:"説明はまだありません" }}</p>
+                    <p style="color: #bbb;">
+                        {% if item.spot.description %}
+                            {{ item.spot.description }}
+                        {% else %}
+                            {% trans "説明はまだありません" %}
+                        {% endif %}
+                    </p>
 
                     {% if item.spot.latitude and item.spot.longitude %}
                         <a class="btn-map" href="{% url 'map' %}?lat={{ item.spot.latitude }}&lng={{ item.spot.longitude }}">
-                            🌏 マップで見る
+                            {% trans "🌏 マップで見る" %}
                         </a>
                     {% endif %}
                 </div>
             </div>
         {% empty %}
-            <p>まだ聖地が登録されていません。</p>
+            <p>{% trans "まだ聖地が登録されていません。" %}</p>
         {% endfor %}
 
         <div style="margin-top: 40px;">
-            <a href="{% url 'spot_list' %}" style="color: #aaa;">← アニメ一覧に戻る</a>
+            <a href="{% url 'spot_list' %}" style="color: #aaa;">{% trans "← アニメ一覧に戻る" %}</a>
         </div>
     </div>
 </body>
