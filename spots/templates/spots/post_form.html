@@ -43,8 +43,13 @@
                 {{ form.text.label_tag }}
                 {{ form.text }}
 
-                {{ form.image.label_tag }}
-                {{ form.image }}
+                <p>
+                    {{ form.image.label_tag }}
+                    <div class="custom-file-input">
+                        {{ form.image }}
+                        <span class="custom-file-label">{% trans "Choose Image" %}</span>
+                    </div>
+                </p>
             </div>
 
             <button type="submit" style="width:100%;margin-top:20px;">

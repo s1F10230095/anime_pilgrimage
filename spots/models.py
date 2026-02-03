@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 # アニメ作品モデル（追加）
 class Work(models.Model):
@@ -45,15 +46,24 @@ class Spot(models.Model):
 # ユーザーの投稿（巡礼記録）モデル
 class Post(models.Model):
     spot = models.ForeignKey(
-        Spot,
+        'Spot',  # Spotモデルが同じファイルの下にある場合は文字列で指定
         on_delete=models.CASCADE,
         related_name='posts',
         null=True,
-        blank=True
+        blank=True,
+        verbose_name=_("聖地（ハッシュタグ）")  # ラベルを翻訳対象に
     )
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField()
-    image = models.ImageField(upload_to='post_images/', blank=True, null=True)
+    
+    # 2. verbose_name を追加し、_("文字列") で囲む
+    text = models.TextField(verbose_name=_("本文"))
+    image = models.ImageField(
+        _("画像"), # 第一引数に書くことでも verbose_name と同様に機能します
+        upload_to='post_images/', 
+        blank=True, 
+        null=True
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
 
     likes = models.ManyToManyField(

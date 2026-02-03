@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-11 04:20+0900\n"
+"POT-Creation-Date: 2026-01-14 10:25+0900\n"
 "PO-Revision-Date: 2026-01-11 04:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,30 +17,69 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: accounts/templates/accounts/login.html:7
+#: accounts/templates/accounts/login.html:12 spots/templates/spots/home.html:22
+#: spots/templates/spots/map.html:60 spots/templates/spots/map.html:76
+#: spots/templates/spots/sidebar.html:69
+msgid "ログイン"
+msgstr "Login"
+
+#: accounts/templates/accounts/login.html:7
+#: accounts/templates/accounts/profile_edit.html:7
+#: accounts/templates/accounts/signup.html:7 spots/templates/spots/home.html:6
+#: spots/templates/spots/post_form.html:7
+#: spots/templates/spots/post_list.html:7
+msgid "アニメ聖地巡礼"
+msgstr "Anime Pilgrimage"
+
+#: accounts/templates/accounts/login.html:21
+msgid "ログインする"
+msgstr "Sign In"
+
+#: accounts/templates/accounts/login.html:26
+msgid "アカウントをお持ちでないですか？"
+msgstr "Don't have an account?"
+
+#: accounts/templates/accounts/login.html:28
+msgid "新規アカウント登録はこちら"
+msgstr "Create a new account here"
+
+#: accounts/templates/accounts/login.html:32
+#: accounts/templates/accounts/signup.html:28
+msgid "ホームへ戻る"
+msgstr "Back to Home"
+
 #: accounts/templates/accounts/profile_detail.html:7
 #: accounts/templates/accounts/profile_detail.html:14
-#: spots/templates/spots/sidebar.html:40
+#: accounts/templates/accounts/profile_public.html:7
+#: accounts/templates/accounts/profile_public.html:14
+#: spots/templates/spots/sidebar.html:57
 msgid "プロフィール"
 msgstr "Profile"
 
 #: accounts/templates/accounts/profile_detail.html:20
 #: accounts/templates/accounts/profile_detail.html:66
+#: accounts/templates/accounts/profile_public.html:26
 msgid "No Image"
 msgstr "No Image"
 
 #: accounts/templates/accounts/profile_detail.html:26
+#: accounts/templates/accounts/profile_public.html:37
 msgid "自己紹介"
 msgstr "Biography"
 
 #: accounts/templates/accounts/profile_detail.html:31
+#: accounts/templates/accounts/profile_public.html:44
 msgid "自己紹介はまだありません。"
 msgstr "No biography yet."
 
 #: accounts/templates/accounts/profile_detail.html:37
+#: accounts/templates/accounts/profile_public.html:53
 msgid "獲得した称号"
 msgstr "Titles Obtained"
 
 #: accounts/templates/accounts/profile_detail.html:50
+#: accounts/templates/accounts/profile_public.html:74
 msgid "まだ称号を獲得していません。"
 msgstr "You haven't obtained any titles yet."
 
@@ -49,10 +88,12 @@ msgid "聖地を訪れて称号をゲットしよう！"
 msgstr "Visit holy sites and get titles!"
 
 #: accounts/templates/accounts/profile_detail.html:57
+#: accounts/templates/accounts/profile_public.html:83
 msgid "お気に入りの聖地"
 msgstr "Favorite Spots"
 
 #: accounts/templates/accounts/profile_detail.html:77
+#: accounts/templates/accounts/profile_public.html:101
 msgid "まだお気に入りの聖地はありません。"
 msgstr "No favorite spots yet."
 
@@ -66,13 +107,6 @@ msgstr "Edit Profile"
 msgid "プロフィール編集"
 msgstr "Edit Profile"
 
-#: accounts/templates/accounts/profile_edit.html:7
-#: accounts/templates/accounts/signup.html:7 spots/templates/spots/home.html:6
-#: spots/templates/spots/post_form.html:6
-#: spots/templates/spots/post_list.html:6
-msgid "アニメ聖地巡礼"
-msgstr "Anime Pilgrimage"
-
 #: accounts/templates/accounts/profile_edit.html:22
 msgid "変更を保存する"
 msgstr "Save Changes"
@@ -82,7 +116,7 @@ msgid "キャンセルして戻る"
 msgstr "Cancel and Return"
 
 #: accounts/templates/accounts/signup.html:7 spots/templates/spots/map.html:77
-#: spots/templates/spots/sidebar.html:50
+#: spots/templates/spots/sidebar.html:70
 msgid "新規登録"
 msgstr "Sign Up"
 
@@ -102,10 +136,6 @@ msgstr "Already have an account?"
 msgid "ログインはこちら"
 msgstr "Login here"
 
-#: accounts/templates/accounts/signup.html:28
-msgid "ホームへ戻る"
-msgstr "Back to Home"
-
 #: anime_pilgrimage/settings.py:111
 msgid "Japanese"
 msgstr "Japanese"
@@ -113,6 +143,18 @@ msgstr "Japanese"
 #: anime_pilgrimage/settings.py:112
 msgid "English"
 msgstr "English"
+
+#: spots/models.py:54 spots/templates/spots/post_form.html:36
+msgid "聖地（ハッシュタグ）"
+msgstr "Sacred Sites (Hashtags)"
+
+#: spots/models.py:59
+msgid "本文"
+msgstr "Content"
+
+#: spots/models.py:61
+msgid "画像"
+msgstr "Image"
 
 #: spots/templates/spots/ai_travel.html:7
 msgid "AI 聖地巡礼プラン相談"
@@ -131,7 +173,8 @@ msgid ""
 "例：サマータイムレンダの聖地である友ヶ島に旅行しに行きたい。朝10時に和歌山市"
 "駅を出発するプランで。"
 msgstr ""
-"Example: I want to visit Tomogashima, the site of Summer Time Rendering. Plan to depart from Wakayamashi Station at 10 AM."
+"Example: I want to visit Tomogashima, the site of Summer Time Rendering. "
+"Plan to depart from Wakayamashi Station at 10 AM."
 
 #: spots/templates/spots/ai_travel.html:34
 msgid "プランを作成する"
@@ -149,7 +192,8 @@ msgstr "Transfer Navigation by Segment"
 msgid ""
 "Googleマップの仕様上、区間ごとに検索すると詳細な乗り換えが表示されます。"
 msgstr ""
-"Due to Google Maps specifications, searching by segment provides more detailed transfer information."
+"Due to Google Maps specifications, searching by segment provides more "
+"detailed transfer information."
 
 #: spots/templates/spots/ai_travel.html:53
 msgid "(参考) 全体の直行ルートを検索"
@@ -183,11 +227,6 @@ msgstr "Start"
 msgid "ゲストで始める"
 msgstr "Start as Guest"
 
-#: spots/templates/spots/home.html:22 spots/templates/spots/map.html:60
-#: spots/templates/spots/map.html:76 spots/templates/spots/sidebar.html:49
-msgid "ログイン"
-msgstr "Login"
-
 #: spots/templates/spots/home.html:25
 msgid "新規登録はこちら"
 msgstr "Sign up here"
@@ -196,7 +235,7 @@ msgstr "Sign up here"
 msgid "アニメ聖地マップ"
 msgstr "Anime Holy Sites Map"
 
-#: spots/templates/spots/map.html:73 spots/templates/spots/sidebar.html:44
+#: spots/templates/spots/map.html:73 spots/templates/spots/sidebar.html:64
 msgid "ログアウト"
 msgstr "Logout"
 
@@ -208,81 +247,104 @@ msgstr "Selected Spot"
 msgid "現在地"
 msgstr "Current Location"
 
-#: spots/templates/spots/post_form.html:6
-#: spots/templates/spots/post_form.html:13
+#: spots/templates/spots/post_form.html:7
+#: spots/templates/spots/post_form.html:15
 msgid "新規投稿"
 msgstr "New Post"
 
-#: spots/templates/spots/post_form.html:21
+#: spots/templates/spots/post_form.html:23
 msgid "⚠️ 投稿できませんでした"
 msgstr "⚠️ Failed to post"
 
 #: spots/templates/spots/post_form.html:39
-#: spots/templates/spots/post_list.html:106
-#: spots/templates/spots/sidebar.html:9
+msgid "※ 選択した聖地は #タグ として表示されます"
+msgstr "* Selected sites will be displayed as #hashtags"
+
+#: spots/templates/spots/post_form.html:50
+msgid "Choose Image"
+msgstr "No Image"
+
+#: spots/templates/spots/post_form.html:56
+#: spots/templates/spots/sidebar.html:18
 msgid "投稿する"
 msgstr "Post"
 
-#: spots/templates/spots/post_form.html:44
-msgid "← 投稿一覧に戻る"
+#: spots/templates/spots/post_form.html:62
+msgid "投稿一覧に戻る"
 msgstr "← Back to Posts"
 
-#: spots/templates/spots/post_list.html:6 spots/templates/spots/sidebar.html:8
+#: spots/templates/spots/post_list.html:7 spots/templates/spots/sidebar.html:17
 msgid "投稿一覧"
 msgstr "Post List"
 
-#: spots/templates/spots/post_list.html:68
+#: spots/templates/spots/post_list.html:43
 msgid "みんなの巡礼記録"
 msgstr "Everyone's Pilgrimage Records"
 
-#: spots/templates/spots/post_list.html:71
-msgid "＋ 新規投稿する"
-msgstr "+ Create New Post"
+#: spots/templates/spots/post_list.html:47
+msgid "新規投稿する"
+msgstr "Create New Post"
 
-#: spots/templates/spots/post_list.html:98
-msgid "投稿画像"
-msgstr "Posted Image"
+#: spots/templates/spots/post_list.html:86
+msgid "💬 返信"
+msgstr "💬 Replies"
 
-#: spots/templates/spots/post_list.html:104
-msgid "まだ投稿がありません。"
+#: spots/templates/spots/post_list.html:94
+msgid "返信はまだありません"
+msgstr "No replies yet."
+
+#: spots/templates/spots/post_list.html:100
+msgid "返信を書く"
+msgstr "Write a reply..."
+
+#: spots/templates/spots/post_list.html:103
+msgid "送信"
+msgstr "Send"
+
+#: spots/templates/spots/post_list.html:113
+msgid "削除"
+msgstr "Delete"
+
+#: spots/templates/spots/post_list.html:120
+msgid "まだ投稿がありません"
 msgstr "No posts yet."
 
-#: spots/templates/spots/post_list.html:105
-msgid "一番乗りで投稿してみましょう！"
-msgstr "Be the first to post!"
-
-#: spots/templates/spots/sidebar.html:1
+#: spots/templates/spots/sidebar.html:4
 msgid "☰ メニュー"
 msgstr "☰ Menu"
 
-#: spots/templates/spots/sidebar.html:4
+#: spots/templates/spots/sidebar.html:11
 msgid "✖ 閉じる"
 msgstr "✖ Close"
 
-#: spots/templates/spots/sidebar.html:5
+#: spots/templates/spots/sidebar.html:14
 msgid "ホーム"
 msgstr "Home"
 
-#: spots/templates/spots/sidebar.html:6 spots/templates/spots/spot_list.html:6
+#: spots/templates/spots/sidebar.html:15
 #: spots/templates/spots/spot_list.html:11
-msgid "聖地一覧"
-msgstr "Spot List"
+msgid "アニメ一覧"
+msgstr "Anime List"
 
-#: spots/templates/spots/sidebar.html:7
+#: spots/templates/spots/sidebar.html:16
 msgid "マップ"
 msgstr "Map"
 
-#: spots/templates/spots/sidebar.html:10
+#: spots/templates/spots/sidebar.html:19
 msgid "AI旅行プラン"
 msgstr "AI Travel Plan"
 
-#: spots/templates/spots/sidebar.html:11
+#: spots/templates/spots/sidebar.html:20
 msgid "問い合わせ"
 msgstr "Contact"
 
-#: spots/templates/spots/sidebar.html:16
+#: spots/templates/spots/sidebar.html:26
 msgid "言語 / Language"
 msgstr "Language"
+
+#: spots/templates/spots/spot_list.html:6
+msgid "聖地一覧"
+msgstr "Spot List"
 
 #: spots/templates/spots/spot_list.html:12
 msgid "ジャンル："
@@ -291,6 +353,52 @@ msgstr "Genre:"
 #: spots/templates/spots/spot_list.html:13
 msgid "すべて"
 msgstr "All"
+
+#: spots/templates/spots/work_detail.html:7
+#, fuzzy
+#| msgid "AI 聖地巡礼プラン相談"
+msgid "聖地巡礼スタンプラリー"
+msgstr "Anime Pilgrimage Stamp Rally"
+
+#: spots/templates/spots/work_detail.html:133
+msgid "スタンプラリー"
+msgstr "Stamp Rally"
+
+#: spots/templates/spots/work_detail.html:137
+msgid "🏆 完全制覇！おめでとうございます！"
+msgstr "🏆 Fully Completed! Congratulations!"
+
+#: spots/templates/spots/work_detail.html:138
+msgid "すべての聖地を巡り、特別な称号を獲得しました。"
+msgstr "You have visited all sites and earned a special title."
+
+#: spots/templates/spots/work_detail.html:146
+msgid "聖地チェックリスト"
+msgstr "Site Checklist"
+
+#: spots/templates/spots/work_detail.html:153
+msgid "済"
+msgstr "Visited"
+
+#: spots/templates/spots/work_detail.html:155
+msgid "未訪問"
+msgstr "Not Visited"
+
+#: spots/templates/spots/work_detail.html:178
+msgid "説明はまだありません"
+msgstr "No description available yet."
+
+#: spots/templates/spots/work_detail.html:184
+msgid "🌏 マップで見る"
+msgstr "🌏 View on Map"
+
+#: spots/templates/spots/work_detail.html:190
+msgid "まだ聖地が登録されていません。"
+msgstr "No sites registered yet."
+
+#: spots/templates/spots/work_detail.html:194
+msgid "← アニメ一覧に戻る"
+msgstr "← Back to Anime List"
 
 #: venv/lib/python3.10/site-packages/cloudinary/forms.py:55
 #: venv/lib/python3.10/site-packages/cloudinary/forms.py:124
@@ -1520,3 +1628,6 @@ msgstr ""
 #: venv/lib/python3.10/site-packages/django/views/templates/default_urlconf.html:236
 msgid "Connect, get help, or contribute"
 msgstr ""
+
+#~ msgid "一番乗りで投稿してみましょう！"
+#~ msgstr "Be the first to post!"
