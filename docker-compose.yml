@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # --- アプリ本体 (Django) ---
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app  # PCのコードをコンテナと同期（編集したら即反映）
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env  # .envファイルの内容を読み込む
+    depends_on:
+      - db
+
+  # --- データベース (PostgreSQL) ---
+  # 手元でテストする用に、RenderのDBではなく「Docker内のDB」を立てます
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: anime_db_local
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+
+volumes:
+  postgres_data:
