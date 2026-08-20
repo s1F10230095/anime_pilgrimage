@@ -146,13 +146,13 @@ if not DEBUG:
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            # ★ 変更箇所： 'Manifest' という文字を削除して、厳格なチェックを外します
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage", 
+            # ★ 変更箇所：WhiteNoiseの圧縮をやめ、Django標準機能に戻す
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 else:
-    # 🟢 開発環境 (ローカル) はそのまま
+    # 🟢 開発環境 (ローカル)
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
