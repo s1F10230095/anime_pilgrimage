@@ -48,7 +48,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -146,11 +145,11 @@ if not DEBUG:
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            # ★ 変更箇所：WhiteNoiseの圧縮をやめ、Django標準機能に戻す
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            # ★ 変更箇所：ここを Cloudinary に戻します！
+            "BACKEND": "cloudinary_storage.storage.StaticHashedCloudinaryStorage",
         },
     }
-    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+    STATICFILES_STORAGE = "cloudinary_storage.storage.StaticHashedCloudinaryStorage"
 else:
     # 🟢 開発環境 (ローカル)
     STORAGES = {
