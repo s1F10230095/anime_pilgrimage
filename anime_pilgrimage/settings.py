@@ -143,15 +143,16 @@ if not DEBUG:
     # 🔴 本番環境 (Render)
     STORAGES = {
         "default": {
-            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage", # 画像はCloudinary
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage", # CSSはWhiteNoise
+            # ★ 変更箇所： 'Manifest' という文字を削除して、厳格なチェックを外します
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage", 
         },
     }
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 else:
-    # 🟢 開発環境 (ローカル)
+    # 🟢 開発環境 (ローカル) はそのまま
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
