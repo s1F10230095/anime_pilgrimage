@@ -25,4 +25,4 @@ COPY . /app/
 
 # 7. コンテナ起動時に実行するコマンド
 # (Renderと同じgunicornを使って起動。ポート8000で待ち受け)
-CMD ["gunicorn", "anime_pilgrimage.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD sh -c "python manage.py collectstatic --no-input && python manage.py migrate && gunicorn anime_pilgrimage.wsgi:application --bind 0.0.0.0:8000"
